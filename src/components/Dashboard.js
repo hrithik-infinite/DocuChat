@@ -1,8 +1,14 @@
 "use client";
 
+import axios from "axios";
 import UploadButton from "./UploadButton";
 
 const Dashboard = () => {
+    const test = async() => {
+        const resp = await axios.get("/api/getUserFiles");
+        console.log(resp);
+    }
+    test();
   return (
     <main className="mx-auto max-w-7xl md:p-10">
       <div className="mt-8 flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-center sm:gap-0">
@@ -10,7 +16,7 @@ const Dashboard = () => {
         <UploadButton></UploadButton>
       </div>
 
-      
+
     </main>
   );
 };
