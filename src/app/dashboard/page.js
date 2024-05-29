@@ -20,7 +20,13 @@ const Page = async () => {
     redirect("/auth-callback?origin=dashboard");
   }
 
-  return <Dashboard />;
+  const fileList = await prismadb.file.findMany({
+    where: {
+      userId: userId,
+    },
+  });
+  console.log("filelisttt" , fileList)
+  return <Dashboard files = {fileList} />;
 };
 
 export default Page;
