@@ -2,8 +2,9 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 import prismadb from "@/lib/prismadb";
+import Dashboard from "@/components/Dashboard";
 
-const Dashboard = async () => {
+const Page = async () => {
   const { userId } = auth();
 
   if (!userId) {
@@ -18,9 +19,8 @@ const Dashboard = async () => {
   if (!dbUser) {
     redirect("/auth-callback?origin=dashboard");
   }
-  // const user = await currentUser();
 
-  return <div>{userId}</div>;
+  return <Dashboard />;
 };
 
-export default Dashboard;
+export default Page;
