@@ -6,7 +6,17 @@ import { Ghost, Plus, MessageSquare, Trash } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Button } from "./ui/button";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 const Dashboard = ({ files }) => {
+  const router = useRouter();
+
+  const deleteFileHandler = async (id) => {
+    console.log(id);
+    await axios.delete(`/api/deleteuserfile`, { data: { id } });
+    router.refresh();
+  };
+
   return (
     <main className="mx-auto max-w-7xl md:p-10">
       <div className="mt-8 flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-center sm:gap-0">
@@ -38,7 +48,7 @@ const Dashboard = ({ files }) => {
                     <MessageSquare className="h-4 w-4" />
                     mocked
                   </div>
-                  <Button size="sm" className="w-full" variant="destructive">
+                  <Button size="sm" className="w-full" variant="destructive" onClick={() => deleteFileHandler(file.id)}>
                     <Trash className="h-4 w-4" />
                   </Button>
                 </div>
