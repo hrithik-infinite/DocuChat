@@ -5,10 +5,12 @@ import { Button } from "./ui/button";
 import Dropzone from "react-dropzone";
 import { Cloud, File, Loader2 } from "lucide-react";
 import { Progress } from "./ui/progress";
+import { useUploadThing } from "@/lib/uploadThing";
 
 const UploadDropzone = () => {
   const [isUploading, setIsUploading] = useState(true);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const { startUpload } = useUploadThing("pdfUploader");
   const startSimulatedProgress = () => {
     setUploadProgress(0);
     const interval = setInterval(() => {
@@ -28,9 +30,9 @@ const UploadDropzone = () => {
       onDrop={async (acceptedFile) => {
         setIsUploading(true);
         const progressInterval = startSimulatedProgress();
-        await new Promise((resolve) => {
-          setTimeout(resolve, 3500);
-        });
+        const res = await startUpload(acceptedFile);
+        console.log("ressssssssssssss___________________", res);
+
         clearInterval(progressInterval);
         setUploadProgress(100);
       }}>
@@ -55,7 +57,7 @@ const UploadDropzone = () => {
               ) : null}
               {isUploading ? (
                 <div className="w-full mt-4 max-w-xs mx-auto">
-                  <Progress indicatorColor={uploadProgress === 100 ? "bg-green-500" : ""} value={uploadProgress} className="h-1 w-full bg-zinc-200" />
+                  <Progress indicatorcolor={uploadProgress === 100 ? "bg-green-500" : ""} value={uploadProgress} className="h-1 w-full bg-zinc-200" />
                   {uploadProgress === 100 ? (
                     <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-center pt-2">
                       <Loader2 className="h-3 w-3 animate-spin" />
