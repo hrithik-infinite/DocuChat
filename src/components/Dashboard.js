@@ -12,7 +12,6 @@ const Dashboard = ({ files }) => {
   const router = useRouter();
 
   const deleteFileHandler = async (id) => {
-    console.log(id);
     await axios.delete(`/api/deleteuserfile`, { data: { id } });
     router.refresh();
   };

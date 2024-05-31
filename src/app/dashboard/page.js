@@ -25,7 +25,6 @@ const Page = async () => {
       userId: userId,
     },
   });
-  console.log("filelisttt" , fileList)
   return <Dashboard files = {fileList} />;
 };
 

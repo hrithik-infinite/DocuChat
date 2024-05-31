@@ -33,7 +33,6 @@ const UploadDropzone = () => {
         setIsUploading(true);
         const progressInterval = startSimulatedProgress();
         const res = await startUpload(acceptedFile);
-        console.log("resss", res);
         if (!res) {
           return toast({
             title: "Something went wrong",
