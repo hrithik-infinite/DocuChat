@@ -13,7 +13,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+
 const PDFRenderer = ({ url }) => {
   const { toast } = useToast();
   const [numPages, setNumPages] = useState();
