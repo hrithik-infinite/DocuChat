@@ -7,12 +7,37 @@ import { Cloud, File, Loader2 } from "lucide-react";
 import { Progress } from "./ui/progress";
 import { useUploadThing } from "@/lib/uploadThing";
 import { useToast } from "./ui/use-toast";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const UploadDropzone = () => {
+  const router = useRouter();
   const [isUploading, setIsUploading] = useState(true);
   const [uploadProgress, setUploadProgress] = useState(0);
   const { startUpload } = useUploadThing("pdfUploader");
   const { toast } = useToast();
+
+  const startPolling = (key) => {
+    const keyFinal = key.substring(0, key.length - 4);
+    let polling;
+    const fetchFile = async () => {
+      try {
+        const file = await axios.get(`/api/getFile?key=${keyFinal}`);
+        if (file && file.data) {
+          router.push(`/dashboard/${file.data.id}`);
+          clearInterval(polling);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    polling = setInterval(fetchFile, 500);
+    fetchFile();
+
+    return () => {
+      clearInterval(polling);
+    };
+  };
   const startSimulatedProgress = () => {
     setUploadProgress(0);
     const interval = setInterval(() => {
@@ -52,6 +77,7 @@ const UploadDropzone = () => {
 
         clearInterval(progressInterval);
         setUploadProgress(100);
+        startPolling(key);
       }}>
       {({ getRootProps, getInputProps, acceptedFiles }) => (
         <div {...getRootProps()} className="border h-64 m-4 border-dashed border-gray-300 rounded-lg">
@@ -83,6 +109,7 @@ const UploadDropzone = () => {
                   ) : null}
                 </div>
               ) : null}
+              <input {...getInputProps()} type="file" id="dropzone-file" className="hidden" />
             </label>
           </div>
         </div>
