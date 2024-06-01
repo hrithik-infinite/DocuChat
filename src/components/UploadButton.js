@@ -12,7 +12,7 @@ import axios from "axios";
 
 const UploadDropzone = () => {
   const router = useRouter();
-  const [isUploading, setIsUploading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const { startUpload } = useUploadThing("pdfUploader");
   const { toast } = useToast();
@@ -109,7 +109,6 @@ const UploadDropzone = () => {
                   ) : null}
                 </div>
               ) : null}
-              <input {...getInputProps()} type="file" id="dropzone-file" className="hidden" />
             </label>
           </div>
         </div>
