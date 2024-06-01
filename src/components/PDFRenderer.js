@@ -1,5 +1,5 @@
 "use client";
-import { ChevronDown, ChevronUp, Loader2, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, RotateCw, Search } from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -21,6 +21,8 @@ const PDFRenderer = ({ url }) => {
   const [numPages, setNumPages] = useState();
   const [currPage, setCurrPage] = useState(1);
   const [scale, setScale] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [renderedScale, setRenderedScale] = useState(null);
   const CustomPageValidator = z.object({
     page: z.string().refine((num) => Number(num) > 0 && Number(num) <= numPages),
   });
@@ -92,6 +94,9 @@ const PDFRenderer = ({ url }) => {
               <DropdownMenuItem onSelect={() => setScale(2.5)}>250%</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button onClick={() => setRotation((prev) => prev + 90)} variant="ghost">
+            <RotateCw className="h-4 w-4" />
+          </Button>
         </div>
       </div>
       <div className="flex-1 w-full max-h-screen">
@@ -113,7 +118,7 @@ const PDFRenderer = ({ url }) => {
               onLoadSuccess={({ numPages }) => setNumPages(numPages)}
               file={url}
               className="max-h-full">
-              <Page width={width ? width : 1} pageNumber={currPage} scale={scale}></Page>
+              <Page width={width ? width : 1} pageNumber={currPage} scale={scale} rotate={rotation}></Page>
             </Document>
           </div>
         </SimpleBar>
