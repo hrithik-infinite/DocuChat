@@ -2,7 +2,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import NavBar from "@/components/NavBar";
-import { ClerkProvider} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
+import { ToasterProvider } from "../../provider/toast-provider";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -15,6 +17,7 @@ export default function RootLayout({ children }) {
     <ClerkProvider>
       <html lang="en">
         <body className={cn("min-h-screen font-sans antialiased grainy", inter.className)}>
+          <ToasterProvider />
           <NavBar />
           {children}
         </body>

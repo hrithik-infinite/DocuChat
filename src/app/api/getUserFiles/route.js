@@ -9,6 +9,5 @@ export async function GET() {
       userId: userId,
     },
   });
-  console.log("fileList", fileList);
   return new Response(fileList);
 }
