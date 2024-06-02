@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import NavBar from "@/components/NavBar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ToasterProvider } from "../../provider/toast-provider";
-import 'simplebar-react/dist/simplebar.min.css'
+import "simplebar-react/dist/simplebar.min.css";
 
 const inter = Inter({ subsets: ["latin"] });
 

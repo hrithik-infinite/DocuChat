@@ -6,9 +6,13 @@ import { ChevronLeft, Loader2, XCircle } from "lucide-react";
 import axios from "axios";
 import { buttonVariants } from "../ui/button";
 import Link from "next/link";
+import { ChatContextProvider } from "./ChatContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 const ChatWrapper = ({ fileId }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [uploadStatus, setUploadStatus] = useState("PROCESSING");
+  const queryClient = new QueryClient();
 
   useEffect(() => {
     const startPolling = () => {
@@ -95,12 +99,16 @@ const ChatWrapper = ({ fileId }) => {
     );
   }
   return (
-    <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
-      <div className="flex-1 justify-between flex flex-col mb-28">
-        <Messages />
-      </div>
-      <ChatInput />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <ChatContextProvider fileId={fileId}>
+        <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
+          <div className="flex-1 justify-between flex flex-col mb-28">
+            <Messages />
+          </div>
+          <ChatInput />
+        </div>
+      </ChatContextProvider>
+    </QueryClientProvider>
   );
 };
 

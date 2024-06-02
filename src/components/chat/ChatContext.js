@@ -16,7 +16,7 @@ export const ChatContextProvider = ({ fileId, children }) => {
 
   const { toast } = useToast();
 
-  const { sendMessage } = useMutation({
+  const { mutate: sendMessage } = useMutation({
     mutationFn: async ({ message }) => {
       const response = await axios.post("/api/message", {
         fileId,

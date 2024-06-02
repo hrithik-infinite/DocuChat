@@ -1,5 +1,5 @@
 import { SendMessageValidator } from "@/lib/SendMessageValidator";
-import { auth } from "@clerk/nextjs/dist/types/server";
+import { auth } from "@clerk/nextjs/server";
 import prismadb from "@/lib/prismadb";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { pinecone } from "@/lib/pinecone";
@@ -24,7 +24,7 @@ export const POST = async (req) => {
 
   await prismadb.message.create({
     data: {
-      test: message,
+      text: message,
       isUserMessage: true,
       userId,
       fileId,
