@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function Home() {
   return (
     <>
-      <Wrapper className="mb-12 mt-28 sm:mt-40 flex flex-col items-center justify-center text-center">
+      <Wrapper className="mb-12 mt-28 flex flex-col items-center justify-center text-center sm:mt-40">
         <div className="mx-auto mb-4 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 bg-white px-7 py-2 shadow-md backdrop-blur transition-all hover:border-gray-300 hover:bg-white/50">
           <p className="text-sm font-semibold text-gray-700">DocuChat is now public!</p>
         </div>
@@ -40,7 +40,7 @@ export default function Home() {
             <div className="mx-auto max-w-6xl px-6 lg:px-8">
               <div className="mt-16 flow-root sm:mt-24">
                 <div className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
-                  <Image src="/dashboard-preview.jpg" alt="product preview" width={1364} height={866} quality={100} className="rounded-md bg-white p-2 sm:p-8 md:p-20 shadow-2xl ring-1 ring-gray-900/10" />
+                  <Image src="/dashboard-preview.jpg" alt="product preview" width={1364} height={866} quality={100} className="rounded-md bg-white p-2 shadow-2xl ring-1 ring-gray-900/10 sm:p-8 md:p-20" />
                 </div>
               </div>
             </div>
@@ -60,7 +60,7 @@ export default function Home() {
       <div className="mx-auto mb-32 mt-32 max-w-5xl sm:mt-56">
         <div className="mb-12 px-6 lg:px-8">
           <div className="mx-auto max-w-2xl sm:text-center">
-            <h2 className="mt-2 font-bold text-4xl text-gray-900 sm:text-5xl">Start chatting in minutes</h2>
+            <h2 className="mt-2 text-4xl font-bold text-gray-900 sm:text-5xl">Start chatting in minutes</h2>
             <p className="mt-4 text-lg text-gray-600">Chatting to your PDF files has never been easier than with DocuChat.</p>
           </div>
         </div>
@@ -98,7 +98,7 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
           <div className="mt-16 flow-root sm:mt-24">
             <div className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
-              <Image src="/file-upload-preview.jpg" alt="uploading preview" width={1419} height={732} quality={100} className="rounded-md bg-white p-2 sm:p-8 md:p-20 shadow-2xl ring-1 ring-gray-900/10" />
+              <Image src="/file-upload-preview.jpg" alt="uploading preview" width={1419} height={732} quality={100} className="rounded-md bg-white p-2 shadow-2xl ring-1 ring-gray-900/10 sm:p-8 md:p-20" />
             </div>
           </div>
         </div>

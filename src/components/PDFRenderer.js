@@ -45,8 +45,8 @@ const PDFRenderer = ({ url }) => {
     setValue("page", String(page));
   };
   return (
-    <div className="w-full bg-white rounded-md shadow flex flex-col items-center">
-      <div className="h-14 w-full border-b border-zinc-200 flex items-center justify-between px-2">
+    <div className="flex w-full flex-col items-center rounded-md bg-white shadow">
+      <div className="flex h-14 w-full items-center justify-between border-b border-zinc-200 px-2">
         <div className="flex items-center gap-1.5">
           <Button
             variant="ghost"
@@ -60,14 +60,14 @@ const PDFRenderer = ({ url }) => {
           <div className="flex items-center gap-1.5">
             <Input
               {...register("page")}
-              className={cn("w-12 h-8", errors.page && "focus-visible:ring-red-500")}
+              className={cn("h-8 w-12", errors.page && "focus-visible:ring-red-500")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleSubmit(handlePageSubmit)();
                 }
               }}
             />
-            <p className="text-zinc-700 text-sm space-x-1">
+            <p className="space-x-1 text-sm text-zinc-700">
               <span>/</span>
               <span>{numPages ?? "x"}</span>
             </p>
@@ -104,7 +104,7 @@ const PDFRenderer = ({ url }) => {
           <PDFFullScreen fileUrl={url} />
         </div>
       </div>
-      <div className="flex-1 w-full max-h-screen">
+      <div className="max-h-screen w-full flex-1">
         <SimpleBar autoHide={false} className="max-h-[calc(100vh-10rem)]">
           <div ref={ref}>
             <Document
