@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { Button } from "../ui/button";
 import axios from "axios";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { INFINITE_QUERY_LIMIT, loadingMessage } from "@/lib/utils";
