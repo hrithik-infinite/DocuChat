@@ -51,7 +51,6 @@ const ChatWrapper = ({ fileId }) => {
             <p className="text-sm text-zinc-500">We&apos;re preparing your PDF.</p>
           </div>
         </div>
-
         <ChatInput isDisabled />
       </div>
     );
@@ -67,11 +66,11 @@ const ChatWrapper = ({ fileId }) => {
             <p className="text-sm text-zinc-500">This won&apos;t take long.</p>
           </div>
         </div>
-
         <ChatInput isDisabled />
       </div>
     );
   }
+
   if (uploadStatus === "FAILED") {
     return (
       <div className="relative flex min-h-full flex-col justify-between gap-2 divide-y divide-zinc-200 bg-zinc-50">
@@ -93,17 +92,17 @@ const ChatWrapper = ({ fileId }) => {
             </Link>
           </div>
         </div>
-
         <ChatInput isDisabled />
       </div>
     );
   }
+
   return (
     <QueryClientProvider client={queryClient}>
       <ChatContextProvider fileId={fileId}>
         <div className="relative flex min-h-full flex-col justify-between gap-2 divide-y divide-zinc-200 bg-zinc-50">
           <div className="mb-28 flex flex-1 flex-col justify-between">
-            <Messages />
+            <Messages fileId={fileId} />
           </div>
           <ChatInput />
         </div>
