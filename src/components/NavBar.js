@@ -7,10 +7,10 @@ import { ArrowRight } from "lucide-react";
 
 const NavBar = () => {
   return (
-    <nav className="sticky h-14 inset-x-0 top-0 z-30 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all">
+    <nav className="sticky inset-x-0 top-0 z-30 h-14 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all">
       <Wrapper>
         <div className="flex h-14 items-center justify-between border-b border-zinc-200">
-          <Link href="/" className="flex z-40 font-semibold">
+          <Link href="/" className="z-40 flex font-semibold">
             <Image src="/DocuChat_logo_black.png" alt="uploading preview" width={180} height={32} quality={100} />
           </Link>
           <div className="hidden items-center space-x-4 sm:flex">

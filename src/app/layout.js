@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={cn("min-h-screen font-sans antialiased grainy", inter.className)}>
+        <body className={cn("grainy min-h-screen font-sans antialiased", inter.className)}>
           <ToasterProvider />
           <NavBar />
           {children}
