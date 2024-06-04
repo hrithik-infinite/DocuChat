@@ -1,6 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import prismadb from "@/lib/prismadb";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import PDFRenderer from "@/components/PDFRenderer";
 import ChatWrapper from "@/components/chat/ChatWrapper";
 

@@ -1,13 +1,13 @@
 "use client";
-import React from "react";
-import { Button } from "../ui/button";
+import { useContext, useRef } from "react";
 import axios from "axios";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { INFINITE_QUERY_LIMIT, loadingMessage } from "@/lib/utils";
 import Skeleton from "react-loading-skeleton";
 import { MessageSquare } from "lucide-react";
 import Message from "./Message";
-
+import { ChatContext } from "./ChatContext";
+import { useIntersection } from "@mantine/hooks";
 const Messages = ({ fileId }) => {
   const fetchmsg = async ({ pageParam = null, fileId, limit }) => {
     const resp = await axios.post("/api/getFileMessages", { fileId, cursor: pageParam, limit });
@@ -16,23 +16,25 @@ const Messages = ({ fileId }) => {
 
   const useInfiniteFileMessages = (fileId) => {
     return useInfiniteQuery({
-      queryKey: ["fileId", fileId],
+      queryKey: ["fileMessages", fileId],
       queryFn: ({ pageParam = null }) => fetchmsg({ pageParam, fileId, limit: INFINITE_QUERY_LIMIT }),
       getNextPageParam: (lastPage) => lastPage?.nextCursor,
       keepPreviousData: true,
     });
   };
+  const { isLoading: isAiThinking } = useContext(ChatContext);
 
   const { data, isLoading, fetchNextPage } = useInfiniteFileMessages(fileId);
   const messages = data?.pages.flatMap((page) => page.messages);
-  const combinedMessages = [...(isLoading ? [loadingMessage] : []), ...(messages ?? [])];
+  const combinedMessages = [...(isAiThinking ? [loadingMessage] : []), ...(messages ?? [])];
+  const lastMessageRef = useRef(null);
   return (
     <div className="flex max-h-[calc(100vh-3.5rem-7rem)] border-zinc-200 flex-1 flex-col-reverse gap-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
       {combinedMessages && combinedMessages.length > 0 ? (
         combinedMessages.map((message, i) => {
           const isNextMessageSamePerson = combinedMessages[i - 1]?.isUserMessage === combinedMessages[i]?.isUserMessage;
           if (i === combinedMessages.length - 1) {
-            return <Message message={message} isNextMessageSamePerson={isNextMessageSamePerson} key={message.id} />;
+            return <Message ref={lastMessageRef} message={message} isNextMessageSamePerson={isNextMessageSamePerson} key={message.id} />;
           } else return <Message message={message} isNextMessageSamePerson={isNextMessageSamePerson} key={message.id} />;
         })
       ) : isLoading ? (
