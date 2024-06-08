@@ -52,6 +52,7 @@
     "react-resize-detector": "^10.0.1",
     "react-textarea-autosize": "^8.5.3",
     "simplebar-react": "^3.2.5",
+    "stripe": "^15.10.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.4.5",

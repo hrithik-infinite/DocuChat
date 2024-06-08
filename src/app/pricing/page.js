@@ -1,5 +1,5 @@
 import Wrapper from "@/components/Wrapper";
-import { PLANS } from "@/lib/stripe";
+import { PLANS } from "@/lib/stripePlans";
 import { cn } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import { TProvider, Ttip, TtipContent, TtipTrigger } from "../../../provider/tooltip-provider";
