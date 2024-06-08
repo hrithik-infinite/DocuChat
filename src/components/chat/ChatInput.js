@@ -35,7 +35,8 @@ const ChatInput = ({ isDisabled }) => {
               <Button
                 disabled={isLoading || isDisabled}
                 className="absolute bottom-1.5 right-[8px]"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   addMessage();
 
                   textareaRef.current?.focus();
