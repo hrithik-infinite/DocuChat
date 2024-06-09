@@ -1,5 +1,5 @@
 import { PLANS } from "@/lib/stripePlans";
-import { prismadb } from "@/lib/prismadb";
+import  prismadb  from "@/lib/prismadb";
 import Stripe from "stripe";
 import { auth } from "@clerk/nextjs/server";
 

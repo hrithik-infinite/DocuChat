@@ -9,7 +9,7 @@ export async function POST(req, { params }) {
   try {
     const { userId } = auth();
     const billingUrl = absoluteUrl("/dashboard/billing");
-console.log("userid", userId);
+    console.log("userid", userId);
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
