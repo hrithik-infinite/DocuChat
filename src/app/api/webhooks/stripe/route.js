@@ -13,57 +13,76 @@ export async function POST(request) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET || "");
   } catch (err) {
+    console.error("Webhook Error:", err instanceof Error ? err.message : "Unknown Error");
     return NextResponse.json({ error: `Webhook Error: ${err instanceof Error ? err.message : "Unknown Error"}` }, { status: 400 });
   }
-  console.log(event.type, "______________event.type________");
+
+  console.log(`Received event: ${event.type}`);
 
   const session = event.data.object;
   if (!session?.metadata?.userId) {
+    console.warn("Session metadata does not contain userId");
     return NextResponse.json({}, { status: 200 });
   }
+
   switch (event.type) {
     case "checkout.session.completed":
-      console.log("inside http://localhost:3001/dashboard/billin" , session);
+      console.log("Handling checkout.session.completed for session:", session);
       await handleCheckoutSessionCompleted(session);
       break;
 
     case "invoice.payment_succeeded":
+      console.log("Handling invoice.payment_succeeded for session:", session);
       await handleInvoicePaymentSucceeded(session);
       break;
 
     default:
-      console.log(`Unhandled event type ${event.type}`);
+      console.log(`Unhandled event type: ${event.type}`);
   }
 
   return NextResponse.json({}, { status: 200 });
 }
 
 async function handleCheckoutSessionCompleted(session) {
-  const subscription = await stripe.subscriptions.retrieve(session.subscription);
-console.log("api subs", subscription);
-  await prismadb.user.update({
-    where: {
-      id: session.metadata.userId,
-    },
-    data: {
-      stripeSubscriptionId: subscription.id,
-      stripeCustomerId: subscription.customer,
-      stripePriceId: subscription.items.data[0]?.price.id,
-      stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    },
-  });
+  try {
+    const subscription = await stripe.subscriptions.retrieve(session.subscription);
+    console.log("Retrieved subscription:", subscription);
+
+    await prismadb.user.update({
+      where: {
+        id: session.metadata.userId,
+      },
+      data: {
+        stripeSubscriptionId: subscription.id,
+        stripeCustomerId: subscription.customer,
+        stripePriceId: subscription.items.data[0]?.price.id,
+        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      },
+    });
+
+    console.log(`User ${session.metadata.userId} updated with subscription details`);
+  } catch (err) {
+    console.error(`Error handling checkout.session.completed for session ${session.id}:`, err);
+  }
 }
 
 async function handleInvoicePaymentSucceeded(session) {
-  const subscription = await stripe.subscriptions.retrieve(session.subscription);
+  try {
+    const subscription = await stripe.subscriptions.retrieve(session.subscription);
+    console.log("Retrieved subscription:", subscription);
 
-  await prismadb.user.update({
-    where: {
-      stripeSubscriptionId: subscription.id,
-    },
-    data: {
-      stripePriceId: subscription.items.data[0]?.price.id,
-      stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    },
-  });
+    await prismadb.user.update({
+      where: {
+        stripeSubscriptionId: subscription.id,
+      },
+      data: {
+        stripePriceId: subscription.items.data[0]?.price.id,
+        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      },
+    });
+
+    console.log(`User with subscription ${subscription.id} updated with new payment details`);
+  } catch (err) {
+    console.error(`Error handling invoice.payment_succeeded for session ${session.id}:`, err);
+  }
 }

@@ -30,7 +30,6 @@ export async function POST(req) {
     const nextItem = messages.pop();
     nextCursor = nextItem?.id;
   }
-  console.log("messages API Success" , messages.length);
 
   return NextResponse.json({ messages: messages, nextCursor: nextCursor }, { status: 200 });
 }

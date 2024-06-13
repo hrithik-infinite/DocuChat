@@ -9,7 +9,6 @@ export async function POST(req, { params }) {
   try {
     const { userId } = auth();
     const billingUrl = absoluteUrl("/dashboard/billing");
-    console.log("userid", userId);
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -19,14 +18,12 @@ export async function POST(req, { params }) {
         id: userId,
       },
     });
-    console.log("dbUser", dbUser);
 
     if (!dbUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const subscriptionPlan = await getUserSubscriptionPlan();
-    console.log("subscriptionPlan", subscriptionPlan);
     if (subscriptionPlan.isSubscribed && dbUser.stripeCustomerId) {
       const stripeSession = await stripe.billingPortal.sessions.create({
         customer: dbUser.stripeCustomerId,
@@ -40,7 +37,6 @@ export async function POST(req, { params }) {
     if (!plan) {
       return NextResponse.json({ error: "Plan not found" }, { status: 400 });
     }
-    console.log("plan", plan);
 
     const stripeSession = await stripe.checkout.sessions.create({
       success_url: billingUrl,

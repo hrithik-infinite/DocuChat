@@ -28,7 +28,7 @@ const UploadDropzone = () => {
           clearInterval(polling);
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
     polling = setInterval(fetchFile, 500);
