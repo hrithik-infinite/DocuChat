@@ -6,6 +6,7 @@ import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { ArrowRight } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 import { UserButton } from "@clerk/nextjs";
+import MobileNav from "./MobileNav";
 const NavBar = () => {
   const { userId } = auth();
 
@@ -16,6 +17,8 @@ const NavBar = () => {
           <Link href="/" className="z-40 flex font-semibold">
             <Image src="/DocuChat_logo_black.png" alt="uploading preview" width={180} height={32} quality={100} />
           </Link>
+          <MobileNav isAuth={!!userId} />
+
           <div className="hidden items-center space-x-4 sm:flex">
             {!userId ? (
               <>
