@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lib/utils";
+import { cn, constructMetadata } from "@/lib/utils";
 import NavBar from "@/components/NavBar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ToasterProvider } from "../../provider/toast-provider";
@@ -8,10 +8,7 @@ import "simplebar-react/dist/simplebar.min.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
-  title: "DocuChat",
-  description: "Chat with your Documents",
-};
+export const metadata = constructMetadata();
 
 export default function RootLayout({ children }) {
   return (
