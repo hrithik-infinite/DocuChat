@@ -1,8 +1,8 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { NextResponse } from "next/server";
 import prismadb from "@/lib/prismadb";
 import Dashboard from "@/components/Dashboard";
+import { getUserSubscriptionPlan } from "@/lib/stripe";
 
 const Page = async () => {
   const { userId } = auth();
@@ -25,7 +25,9 @@ const Page = async () => {
       userId: userId,
     },
   });
-  return <Dashboard files = {fileList} />;
+  const subscriptionPlan = await getUserSubscriptionPlan();
+
+  return <Dashboard files={fileList} subscriptionPlan={subscriptionPlan} />;
 };
 
 export default Page;

@@ -1,5 +1,5 @@
 import { PLANS } from "@/lib/stripePlans";
-import { prismadb } from "@/lib/prismadb";
+import prismadb from "@/lib/prismadb";
 import Stripe from "stripe";
 import { auth } from "@clerk/nextjs/server";
 
@@ -20,15 +20,11 @@ export async function getUserSubscriptionPlan() {
       };
     }
 
-    console.log(userId, "usssssssssssssssssssssssssss");
-
     const dbUser = await prismadb.user.findUnique({
       where: {
         id: userId,
       },
     });
-
-    console.log(dbUser, "dddddddddsssssssssssssssssssssssssss");
 
     if (!dbUser) {
       return {
@@ -41,16 +37,11 @@ export async function getUserSubscriptionPlan() {
 
     const isSubscribed = Boolean(dbUser.stripePriceId && dbUser.stripeCurrentPeriodEnd && dbUser.stripeCurrentPeriodEnd.getTime() + 86_400_000 > Date.now());
 
-    console.log("issubscribe", isSubscribed);
-
     const plan = isSubscribed ? PLANS.find((plan) => plan.price.priceIds.test === dbUser.stripePriceId) : null;
-
-    console.log("plan", plan);
 
     let isCanceled = false;
     if (isSubscribed && dbUser.stripeSubscriptionId) {
       const stripePlan = await stripe.subscriptions.retrieve(dbUser.stripeSubscriptionId);
-      console.log("stripePlan", stripePlan);
 
       isCanceled = stripePlan.cancel_at_period_end;
     }
@@ -64,7 +55,6 @@ export async function getUserSubscriptionPlan() {
       isCanceled,
     };
   } catch (error) {
-    console.error("Error retrieving user subscription plan:", error);
     return {
       ...PLANS[0],
       isSubscribed: false,
