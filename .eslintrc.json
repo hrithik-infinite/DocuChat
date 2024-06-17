@@ -3,7 +3,7 @@
     "browser": true,
     "es2021": true
   },
-  "extends": ["next/core-web-vitals", "eslint:recommended", "plugin:react/recommended", "plugin:react-hooks/recommended"],
+  "extends": ["next/core-web-vitals", "eslint:recommended", "plugin:react/recommended", "plugin:react-hooks/recommended", "next"],
   "parserOptions": {
     "ecmaVersion": 12,
     "sourceType": "module"
