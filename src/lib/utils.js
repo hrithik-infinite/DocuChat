@@ -19,8 +19,8 @@ export const loadingMessage = {
 
 export function absoluteUrl(path) {
   if (typeof window !== "undefined") return path;
-  console.log("process.env.VERCEL_PROJECT_PRODUCTION_URLprocess.env.VERCEL_PROJECT_PRODUCTION_URLprocess.env.VERCEL_PROJECT_PRODUCTION_URLprocess.env.VERCEL_PROJECT_PRODUCTION_URL", process.env.VERCEL_PROJECT_PRODUCTION_URL);
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `${process.env.VERCEL_PROJECT_PRODUCTION_URL}${path}`;
+  console.log("VERCEL_PROJECT_PRODUCTION_URL ->", process.env.VERCEL_PROJECT_PRODUCTION_URL, "<-");
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}${path}`;
   return `http://localhost:${process.env.PORT ?? 3000}${path}`;
 }
 
