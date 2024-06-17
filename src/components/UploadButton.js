@@ -10,11 +10,11 @@ import { useToast } from "./ui/use-toast";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-const UploadDropzone = () => {
+const UploadDropzone = ({ isSubscribed }) => {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const { startUpload } = useUploadThing("pdfUploader");
+  const { startUpload } = useUploadThing(isSubscribed ? "proPlanUploader" : "freeUploader");
   const { toast } = useToast();
 
   const startPolling = (key) => {
@@ -88,7 +88,7 @@ const UploadDropzone = () => {
                 <p className="mb-2 text-sm text-zinc-700">
                   <span className="font-semibold">Click to upload</span> or drag and drop
                 </p>
-                <p className="text-xs text-zinc-500">PDF (up to 4 MB)</p>
+                <p className="text-xs text-zinc-500">PDF (up to {isSubscribed ? "16 MB" : "4 MB"})</p>
               </div>
               {acceptedFiles && acceptedFiles[0] ? (
                 <div className="flex max-w-xs items-center divide-x divide-zinc-200 overflow-hidden rounded-md bg-white outline outline-[1px] outline-zinc-200">
@@ -117,7 +117,7 @@ const UploadDropzone = () => {
   );
 };
 
-const UploadButton = () => {
+const UploadButton = ({ isSubscribed }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -132,7 +132,7 @@ const UploadButton = () => {
         <Button>Upload PDF</Button>
       </DialogTrigger>
       <DialogContent>
-        <UploadDropzone />
+        <UploadDropzone isSubscribed={isSubscribed} />
       </DialogContent>
     </Dialog>
   );
