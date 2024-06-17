@@ -8,27 +8,26 @@ import { PineconeStore } from "@langchain/pinecone";
 import { pinecone } from "@/lib/pinecone";
 import { getUserSubscriptionPlan } from "@/lib/stripe";
 import { PLANS } from "@/lib/stripePlans";
+
 const f = createUploadthing();
 
 const middleware = async () => {
   const data = await currentUser();
-  const user = data.id;
-  if (!user) throw new UploadThingError("Unauthorized");
+  if (!data || !data.id) throw new UploadThingError("Unauthorized");
 
   const subscriptionPlan = await getUserSubscriptionPlan();
-  console.log("subscriptionPlansubscriptionPlan", subscriptionPlan);
-  return { userId: user };
+  return { userId: data.id, subscriptionPlan };
 };
+
 const onUploadComplete = async ({ metadata, file }) => {
   const fileKey = file.key;
   const keyFinal = fileKey.substring(0, fileKey.length - 4);
-  const isFileExist = await prismadb.file.findFirst({
-    where: {
-      key: keyFinal,
-    },
+  const existingFile = await prismadb.file.findFirst({
+    where: { key: keyFinal },
   });
 
-  if (isFileExist) return;
+  if (existingFile) return;
+
   const createdFile = await prismadb.file.create({
     data: {
       key: keyFinal,
@@ -38,33 +37,31 @@ const onUploadComplete = async ({ metadata, file }) => {
       uploadStatus: "PROCESSING",
     },
   });
-  try {
-    const resp = await fetch(file.url);
-    const blob = await resp.blob();
-    const loader = new PDFLoader(blob);
 
+  try {
+    const response = await fetch(file.url);
+    const blob = await response.blob();
+    const loader = new PDFLoader(blob);
     const pageLevelDocs = await loader.load();
     const pagesAmt = pageLevelDocs.length;
     const { subscriptionPlan } = metadata;
-    const { isSubscribed } = subscriptionPlan;
-    const isProExceeded = pagesAmt > PLANS.find((plan) => plan.name === "Pro").pagesPerPdf;
-    const isFreeExceeded = pagesAmt > PLANS.find((plan) => plan.name === "Free").pagesPerPdf;
+    const isSubscribed = subscriptionPlan.isSubscribed;
+    const proPlan = PLANS.find((plan) => plan.name === "Pro");
+    const freePlan = PLANS.find((plan) => plan.name === "Free");
+
+    const isProExceeded = pagesAmt > (proPlan ? proPlan.pagesPerPdf : 0);
+    const isFreeExceeded = pagesAmt > (freePlan ? freePlan.pagesPerPdf : 0);
+
     if ((isSubscribed && isProExceeded) || (!isSubscribed && isFreeExceeded)) {
       await prismadb.file.update({
-        data: {
-          uploadStatus: "FAILED",
-        },
-        where: {
-          id: createdFile.id,
-        },
+        data: { uploadStatus: "FAILED" },
+        where: { id: createdFile.id },
       });
+      return;
     }
-    // const pinecone = await getPineconeClient();
-    const pineconeIndex = pinecone.Index("docuchat");
 
-    const embeddings = new OpenAIEmbeddings({
-      openAIApiKey: process.env.OPENAI_API_KEY,
-    });
+    const pineconeIndex = pinecone.Index("docuchat");
+    const embeddings = new OpenAIEmbeddings({ openAIApiKey: process.env.OPENAI_API_KEY });
 
     await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
       pineconeIndex,
@@ -72,27 +69,20 @@ const onUploadComplete = async ({ metadata, file }) => {
     });
 
     await prismadb.file.update({
-      data: {
-        uploadStatus: "SUCCESS",
-      },
-      where: {
-        id: createdFile.id,
-      },
+      data: { uploadStatus: "SUCCESS" },
+      where: { id: createdFile.id },
     });
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     await prismadb.file.update({
-      data: {
-        uploadStatus: "SUCCESS",
-      },
-      where: {
-        id: createdFile.id,
-      },
+      data: { uploadStatus: "FAILED" },
+      where: { id: createdFile.id },
     });
   }
 
   return { uploadedBy: metadata.userId };
 };
+
 export const ourFileRouter = {
   freeUploader: f({ pdf: { maxFileSize: "4MB" } })
     .middleware(middleware)
