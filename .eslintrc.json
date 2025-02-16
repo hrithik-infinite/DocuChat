@@ -10,10 +10,8 @@
   },
   "plugins": ["react", "react-hooks"],
   "rules": {
-    "semi": ["error", "always"],
     "quotes": ["error", "double", { "allowTemplateLiterals": true }],
     "no-unused-vars": ["warn"],
-    "no-console": "warn",
     "react/prop-types": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-uses-react": "off",
