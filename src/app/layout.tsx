@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Inter } from "next/font/google";
 import NavBar from "../components/NavBar";
 import Providers from "../components/Providers";
-import { ToastProvider } from "../components/ui/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,8 +22,8 @@ export default function RootLayout({
     <Providers>
       <html lang="en" className="light">
         <body className={cn("grainy min-h-screen font-sans antialiased", inter.className)}>
-          <ToastProvider />
           <NavBar />
+          <Toaster />
           {children}
         </body>
       </html>
