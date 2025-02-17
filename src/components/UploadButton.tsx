@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { trpc } from "../app/_trpc/client";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Progress } from "./ui/progress";
+import { useToast } from "./ui/use-toast";
 
 const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
   const router = useRouter();
