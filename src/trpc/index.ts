@@ -1,7 +1,7 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { privateProcedure, publicProcedure, router } from "./trpc";
 import { TRPCError } from "@trpc/server";
-import { db } from "@/src/db";
+import { db } from "@/db";
 import { z } from "zod";
 import { getUserSubscriptionPlan, stripe } from "@/lib/stripe";
 import { INFINITE_QUERY_LIMIT } from "../config/infinite-query";

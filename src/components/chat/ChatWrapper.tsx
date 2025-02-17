@@ -6,8 +6,8 @@ import { ChevronLeft, Loader2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
 import { ChatContextProvider } from "./ChatContext";
-import { trpc } from "@/src/app/_trpc/client";
-import { PLANS } from "@/src/config/stripe";
+import { trpc } from "@/app/_trpc/client";
+import { PLANS } from "@/config/stripe";
 
 interface ChatWrapperProps {
   fileId: string;

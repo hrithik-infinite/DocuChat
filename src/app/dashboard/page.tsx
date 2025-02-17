@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { getUserSubscriptionPlan } from "@/lib/stripe";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { db } from "@/src/db";
-import Dashboard from "@/src/components/Dashboard";
+import { db } from "@/db";
+import Dashboard from "@/components/Dashboard";
 
 const Page = async () => {
   const { getUser } = getKindeServerSession();
