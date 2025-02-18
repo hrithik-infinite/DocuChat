@@ -21,10 +21,10 @@ const Messages = ({ fileId }: MessagesProps) => {
     },
     {
       getNextPageParam: (lastPage) => lastPage?.nextCursor,
-      keepPreviousData: true
+      placeholderData: (previousData) => previousData
     }
   );
-
+// check placeholderData: (previousData) => previousData,
   const messages = data?.pages.flatMap((page) => page.messages);
 
   const loadingMessage = {
