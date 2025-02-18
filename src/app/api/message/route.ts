@@ -6,7 +6,6 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { PineconeStore } from "@langchain/pinecone";
 import { NextRequest } from "next/server";
-import { openai as openaisdk } from "@ai-sdk/openai";
 import { OpenAIStream, StreamingTextResponse } from "ai";
 
 export const POST = async (req: NextRequest) => {
