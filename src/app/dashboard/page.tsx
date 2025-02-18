@@ -20,14 +20,9 @@ const Page = async () => {
     redirect("/auth-callback?origin=dashboard");
   }
 
-  const fileList = await db.file.findMany({
-    where: {
-      userId: user.id
-    }
-  });
   const subscriptionPlan = await getUserSubscriptionPlan();
 
-  return <Dashboard files={fileList} subscriptionPlan={subscriptionPlan} />;
+  return <Dashboard subscriptionPlan={subscriptionPlan} />;
 };
 
 export default Page;

@@ -24,7 +24,7 @@ const Messages = ({ fileId }: MessagesProps) => {
       placeholderData: (previousData) => previousData
     }
   );
-// check placeholderData: (previousData) => previousData,
+  // check placeholderData: (previousData) => previousData,
   const messages = data?.pages.flatMap((page) => page.messages);
 
   const loadingMessage = {
