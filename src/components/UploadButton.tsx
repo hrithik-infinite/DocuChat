@@ -7,9 +7,10 @@ import Dropzone from "react-dropzone";
 import { Cloud, File, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { trpc } from "../app/_trpc/client";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Progress } from "./ui/progress";
 import { useToast } from "./ui/use-toast";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
   const router = useRouter();
@@ -136,6 +137,9 @@ const UploadButton = ({ isSubscribed }: { isSubscribed: boolean }) => {
       </DialogTrigger>
 
       <DialogContent>
+        <VisuallyHidden>
+          <DialogTitle>My Dialog Title</DialogTitle>
+        </VisuallyHidden>
         <UploadDropzone isSubscribed={isSubscribed} />
       </DialogContent>
     </Dialog>
