@@ -56,7 +56,6 @@ export const appRouter = router({
         id: userId
       }
     });
-
     if (!dbUser) throw new TRPCError({ code: "UNAUTHORIZED" });
 
     const subscriptionPlan = await getUserSubscriptionPlan();
@@ -66,16 +65,14 @@ export const appRouter = router({
         customer: dbUser.stripeCustomerId,
         return_url: billingUrl
       });
-
       return { url: stripeSession.url };
     }
-
     const stripeSession = await stripe.checkout.sessions.create({
       success_url: billingUrl,
       cancel_url: billingUrl,
-      payment_method_types: ["card", "paypal"],
       mode: "subscription",
-      billing_address_collection: "auto",
+      billing_address_collection: "required",
+      allow_promotion_codes: true,
       line_items: [
         {
           price: PLANS.find((plan) => plan.name === "Pro")?.price.priceIds.test,
