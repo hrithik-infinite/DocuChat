@@ -97,7 +97,7 @@ export const POST = async (req: NextRequest) => {
       }
     ]
   });
-  //@ts-ignore
+  //@ts-expect-error deprected
   const stream = OpenAIStream(response, {
     async onCompletion(completion) {
       await db.message.create({
