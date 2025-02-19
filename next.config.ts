@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
