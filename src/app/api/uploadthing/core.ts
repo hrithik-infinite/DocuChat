@@ -1,6 +1,5 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { PineconeStore } from "@langchain/pinecone";
@@ -98,8 +97,7 @@ const onUploadComplete = async ({
         id: createdFile.id
       }
     });
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
     await db.file.update({
       data: {
         uploadStatus: "FAILED"

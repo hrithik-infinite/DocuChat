@@ -2,25 +2,27 @@ import Link from "next/link";
 import MaxWidthWrapper from "./MaxWidthWrapper";
 import Image from "next/image";
 import { buttonVariants } from "./ui/button";
+import { LoginLink, RegisterLink, getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { ArrowRight } from "lucide-react";
-import { auth } from "@clerk/nextjs/server";
-import { UserButton } from "@clerk/nextjs";
-import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/server";
-// import MobileNav from "./MobileNav";
-const NavBar = () => {
-  const { userId } = auth();
+import UserAccountNav from "./UserAccountNav";
+import MobileNav from "./MobileNav";
+
+const NavBar = async () => {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
 
   return (
-    <nav className="sticky inset-x-0 top-0 z-30 h-14 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all">
+    <nav className="sticky h-14 inset-x-0 top-0 z-30 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all">
       <MaxWidthWrapper>
         <div className="flex h-14 items-center justify-between border-b border-zinc-200">
           <Link href="/" className="z-40 flex font-semibold">
             <Image src="/DocuChat_logo_black.png" alt="uploading preview" width={180} height={32} quality={100} />
           </Link>
-          {/* <MobileNav isAuth={!!userId} /> */}
+
+          <MobileNav isAuth={!!user} />
 
           <div className="hidden items-center space-x-4 sm:flex">
-            {!userId ? (
+            {!user ? (
               <>
                 <Link
                   href="/pricing"
@@ -35,13 +37,13 @@ const NavBar = () => {
                     variant: "ghost",
                     size: "sm"
                   })}>
-                  Sign In
+                  Sign in
                 </LoginLink>
                 <RegisterLink
                   className={buttonVariants({
                     size: "sm"
                   })}>
-                  Get Started <ArrowRight className="ml-2 h-5 w-5" />
+                  Get started <ArrowRight className="ml-1.5 h-5 w-5" />
                 </RegisterLink>
               </>
             ) : (
@@ -54,15 +56,8 @@ const NavBar = () => {
                   })}>
                   Dashboard
                 </Link>
-                <Link
-                  href="/dashboard/billing"
-                  className={buttonVariants({
-                    variant: "ghost",
-                    size: "sm"
-                  })}>
-                  Subscription
-                </Link>
-                <UserButton showName />
+
+                <UserAccountNav name={!user.given_name || !user.family_name ? "Your Account" : `${user.given_name} ${user.family_name}`} email={user.email ?? ""} imageUrl={user.picture ?? ""} />
               </>
             )}
           </div>

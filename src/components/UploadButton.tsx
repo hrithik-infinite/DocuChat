@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { useUploadThing } from "../lib/uploadThing";
+import { useUploadThing } from "@/lib/uploadThing";
 import Dropzone from "react-dropzone";
 import { Cloud, File, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { trpc } from "../app/_trpc/client";
+import { trpc } from "@/app/_trpc/client";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Progress } from "./ui/progress";
 import { useToast } from "./ui/use-toast";
@@ -52,6 +52,8 @@ const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
         setIsUploading(true);
 
         const progressInterval = startSimulatedProgress();
+
+        // handle file uploading
         const res = await startUpload(acceptedFile);
 
         if (!res) {
