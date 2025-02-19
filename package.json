@@ -10,8 +10,6 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.1.12",
-    "@clerk/nextjs": "^6.11.3",
     "@hookform/resolvers": "^4.1.0",
     "@kinde-oss/kinde-auth-nextjs": "^2.5.1",
     "@langchain/community": "^0.3.30",
