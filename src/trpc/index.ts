@@ -71,7 +71,7 @@ export const appRouter = router({
       success_url: billingUrl,
       cancel_url: billingUrl,
       mode: "subscription",
-      billing_address_collection: "required",
+      billing_address_collection: "auto",
       allow_promotion_codes: true,
       line_items: [
         {

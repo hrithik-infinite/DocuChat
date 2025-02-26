@@ -54,7 +54,7 @@
     "react-textarea-autosize": "^8.5.7",
     "shadcn": "^2.3.0",
     "simplebar-react": "^3.3.0",
-    "stripe": "^17.6.0",
+    "stripe": "^17.7.0",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
     "uploadthing": "^7.5.1",
