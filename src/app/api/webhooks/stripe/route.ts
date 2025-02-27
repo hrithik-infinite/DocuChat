@@ -8,7 +8,7 @@ export async function POST(request: Request) {
 
   const signature = process.env.STRIPE_SIGNING_SECRET ?? "";
   let event: Stripe.Event;
-
+  console.log("[WEBHOOK SIGNATURE] :", process.env.STRIPE_SIGNING_SECRET)
   try {
     event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET || "");
     console.log("[WEBHOOK VERIFIED] Event Type:", event.type);
