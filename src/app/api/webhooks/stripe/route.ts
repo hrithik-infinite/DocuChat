@@ -1,14 +1,16 @@
 import { db } from "@/db";
 import { stripe } from "@/lib/stripe";
+import { headers } from "next/headers";
 import type Stripe from "stripe";
 
 export async function POST(request: Request) {
   const body = await request.text();
+  const header = await headers();
   console.log("[WEBHOOK RECEIVED] Body:", JSON.stringify(body));
+  console.log("[WEBHOOK RECEIVED] Headers:", JSON.stringify(header), ",", JSON.stringify(request.headers));
 
-  const signature = process.env.STRIPE_SIGNING_SECRET ?? "";
+  const signature = header.get("Stripe-Signature") ?? "";
   let event: Stripe.Event;
-  console.log("[WEBHOOK SIGNATURE] :", process.env.STRIPE_SIGNING_SECRET)
   try {
     event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET || "");
     console.log("[WEBHOOK VERIFIED] Event Type:", event.type);
