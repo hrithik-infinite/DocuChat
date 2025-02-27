@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   const body = await request.text();
   const header = await headers();
   console.log("[WEBHOOK RECEIVED] Body:", JSON.stringify(body));
-  console.log("[WEBHOOK RECEIVED] Headers:", JSON.stringify(header));
+  console.log("[WEBHOOK RECEIVED] Headers:", JSON.stringify(header) , "," , JSON.stringify(request.headers));
 
   const signature = header.get("Stripe-Signature") ?? "";
   let event: Stripe.Event;
