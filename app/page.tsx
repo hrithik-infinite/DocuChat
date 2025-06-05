@@ -1,7 +1,9 @@
+import HeroSection from "@/components/home/HeroSection";
 
 export default function Home() {
   return (
-    <div className="">
+    <div className="relative w-full">
+      <HeroSection />
     </div>
   );
 }
