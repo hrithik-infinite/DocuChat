@@ -10,9 +10,9 @@ export default function UploadHeader() {
         </Badge>
       </div>
       <div className="capitalize text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-        Start Uploading
+        Start Uploading{" "}
         <span className="relative inline-block">
-          <span className="relative z-10 px-2">Your PDF's</span>
+          <span className="relative z-10 px-2">Your PDF&apos;s</span>
           <span className="absolute inset-0 bg-rose-200/50 -rotate-2 rounded-lg transform -skew-y-1" aria-hidden="true"></span>
         </span>
       </div>
