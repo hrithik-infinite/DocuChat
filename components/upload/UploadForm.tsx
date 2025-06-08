@@ -1,7 +1,7 @@
 "use client";
 import { useUploadThing } from "@/utils/uploadthing";
 import UploadFormInput from "./UploadFormInput";
-
+import { toast } from "sonner";
 import { z } from "zod";
 
 export default function UploadForm() {
@@ -17,6 +17,9 @@ export default function UploadForm() {
       console.log("Uploaded successfully");
     },
     onUploadError: (e) => {
+      toast.error("Error occurred while uploading", {
+        description: e.message
+      });
       console.error(e);
     },
     onUploadBegin: () => {}
@@ -27,12 +30,26 @@ export default function UploadForm() {
     const file = formData.get("file") as File;
     const validatedFields = schema.safeParse({ file });
     if (!validatedFields.success) {
-      console.log(validatedFields.error.flatten().fieldErrors.file?.[0] ?? "Invalif File");
+      console.log(validatedFields.error.flatten().fieldErrors.file?.[0] ?? "Invalid File");
+      toast.error("Something went wrong", {
+        description: validatedFields.error.flatten().fieldErrors.file?.[0] ?? "Invalid File"
+      });
       return;
     }
+    toast.info("Uploading PDF", {
+      description: "We are uploading your PDF"
+    });
     const resp = await startUpload([file]);
     console.log("submitted", resp);
-    if (!resp) return;
+    if (!resp) {
+      toast.error("Somethign went wrong!", {
+        description: " Please use a different file"
+      });
+      return;
+    }
+    toast.info("Processing PDF", {
+      description: "Hang tight! Our AI is reading through your document."
+    });
   };
   return (
     <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto">
