@@ -4,7 +4,7 @@ import UploadFormInput from "./UploadFormInput";
 import { toast } from "sonner";
 import { z } from "zod";
 import { generatePdfSummary } from "@/actions/upload-actions";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export default function UploadForm() {
   const schema = z.object({
@@ -14,7 +14,7 @@ export default function UploadForm() {
       .refine((file) => file.type === "application/pdf", { message: "File must be a PDF." })
   });
   const formRef = useRef<HTMLFormElement>(null);
-
+  const [isLoading, setIsLoading] = useState(false);
   const { startUpload, routeConfig } = useUploadThing("pdfUploader", {
     onClientUploadComplete: () => {
       console.log("Uploaded successfully");
@@ -28,8 +28,9 @@ export default function UploadForm() {
     onUploadBegin: () => {}
   });
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
-      e.preventDefault();
+      setIsLoading(true);
       const formData = new FormData(e.currentTarget);
       const file = formData.get("file") as File;
       const validatedFields = schema.safeParse({ file });
@@ -38,6 +39,7 @@ export default function UploadForm() {
         toast.error("Something went wrong", {
           description: validatedFields.error.flatten().fieldErrors.file?.[0] ?? "Invalid File"
         });
+        setIsLoading(false);
         return;
       }
       toast.info("Uploading PDF", {
@@ -49,6 +51,8 @@ export default function UploadForm() {
         toast.error("Somethign went wrong!", {
           description: " Please use a different file"
         });
+        setIsLoading(false);
+
         return;
       }
       toast.info("Processing PDF", {
@@ -64,13 +68,15 @@ export default function UploadForm() {
         formRef.current?.reset();
       }
     } catch (e) {
+      setIsLoading(false);
+
       console.error(e);
       formRef.current?.reset();
     }
   };
   return (
     <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto">
-      <UploadFormInput ref={formRef} onSubmit={handleSubmit} />
+      <UploadFormInput isLoading={isLoading} ref={formRef} onSubmit={handleSubmit} />
     </div>
   );
 }
