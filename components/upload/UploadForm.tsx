@@ -66,6 +66,9 @@ export default function UploadForm() {
           description: "Hang tight! We are saving your summary!."
         });
         formRef.current?.reset();
+        if(data.summary){
+          
+        }
       }
     } catch (e) {
       setIsLoading(false);

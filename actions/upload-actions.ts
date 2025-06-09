@@ -71,7 +71,9 @@ export async function generatePdfSummary(
     return {
       success: true,
       message: "Summary generated successfully",
-      data: summary
+      data: {
+        summary
+      }
     };
   } catch (err) {
     console.error("Error in generatePdfSummary:", err);
