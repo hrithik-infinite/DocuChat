@@ -12,6 +12,7 @@
     "@clerk/nextjs": "^6.21.0",
     "@langchain/community": "^0.3.45",
     "@langchain/core": "^0.3.57",
+    "@neondatabase/serverless": "^1.0.1",
     "@radix-ui/react-slot": "^1.2.3",
     "@uploadthing/react": "^7.3.1",
     "class-variance-authority": "^0.7.1",
