@@ -3,6 +3,7 @@
 import { getDbConnection } from "@/lib/db";
 import { fetchAndExtractPdfText } from "@/lib/langchain";
 import { generateSummaryFromOpenAI } from "@/lib/openai";
+import { formatFileNameAsTitle } from "@/utils/format-utils";
 import { auth } from "@clerk/nextjs/server";
 
 export async function generatePdfSummary(
@@ -70,11 +71,13 @@ export async function generatePdfSummary(
         data: null
       };
     }
+    const formattedFileName = formatFileNameAsTitle(fileName);
     return {
       success: true,
       message: "Summary generated successfully",
       data: {
-        summary
+        summary,
+        title: formattedFileName
       }
     };
   } catch (err) {
@@ -126,10 +129,10 @@ export async function storePdfSummaryAction({ fileUrl, summary, title, fileName 
         message: "Failed to save summary"
       };
     }
-     return {
-        success: true,
-        message: "Failed to save summary"
-      };
+    return {
+      success: true,
+      message: "Failed to save summary"
+    };
   } catch (error) {
     return {
       success: false,
