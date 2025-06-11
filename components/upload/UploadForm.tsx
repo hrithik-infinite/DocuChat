@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { generatePdfSummary, storePdfSummaryAction } from "@/actions/upload-actions";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function UploadForm() {
   const schema = z.object({
@@ -15,6 +16,7 @@ export default function UploadForm() {
   });
   const formRef = useRef<HTMLFormElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const { startUpload, routeConfig } = useUploadThing("pdfUploader", {
     onClientUploadComplete: () => {
       console.log("Uploaded successfully");
@@ -78,12 +80,15 @@ export default function UploadForm() {
           });
         }
         formRef.current?.reset();
+        router.push(`/summaries/${storeResult?.data?.id}`);
       }
     } catch (e) {
       setIsLoading(false);
 
       console.error(e);
       formRef.current?.reset();
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
