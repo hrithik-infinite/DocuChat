@@ -1,34 +1,16 @@
 import BgGradient from "@/components/common/BgGradient";
 import SummaryCard from "@/components/summaries/SummaryCard";
 import { Button } from "@/components/ui/button";
+import { getSummaries } from "@/lib/summaries";
+import { currentUser } from "@clerk/nextjs/server";
 import { ArrowRight, Plus } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default function DashboardPage() {
-  const uploadLimit = 5;
-  const summaries = [
-    {
-      id: 1,
-      title: "Story",
-      created_at: "2025-01-30 20:53:10 759642+00",
-      summary_text: "description",
-      status: "completed"
-    },
-    {
-      id: 2,
-      title: "Research Paper",
-      created_at: "2025-02-10 14:22:05 123456+00",
-      summary_text: "summary of research paper",
-      status: "completed"
-    },
-    {
-      id: 3,
-      title: "Meeting Notes",
-      created_at: "2025-03-05 09:15:30 654321+00",
-      summary_text: "summary of meeting notes",
-      status: "pending"
-    }
-  ];
+export default async function DashboardPage() {
+  const user = await currentUser();
+  if(!user?.id) return redirect("/sign-in");
+  const summaries = await getSummaries(user?.id);
   return (
     <main className="min-h-screen">
       <BgGradient className="opacity-20" />
