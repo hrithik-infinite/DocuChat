@@ -1,4 +1,5 @@
-import BgGradient from "@/components/common/bg-gradient";
+import BgGradient from "@/components/common/BgGradient";
+import SummaryCard from "@/components/summaries/SummaryCard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Plus } from "lucide-react";
 import Link from "next/link";
@@ -31,6 +32,7 @@ export default function DashboardPage() {
               for unlimited uploads.
             </div>
           </div>
+          <div className="grid grid-cols-1 gap-4 m:gap-6 md:grid-cols-2 lg:grid-cols-3 sm:px-0">{[...Array(uploadLimit).map((_, index) => <SummaryCard key={index} />)]}</div>
         </div>
       </div>
     </main>
