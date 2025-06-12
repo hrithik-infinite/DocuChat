@@ -6,6 +6,29 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const uploadLimit = 5;
+  const summaries = [
+    {
+      id: 1,
+      title: "Story",
+      created_at: "2025-01-30 20:53:10 759642+00",
+      summary_text: "description",
+      status: "completed"
+    },
+    {
+      id: 2,
+      title: "Research Paper",
+      created_at: "2025-02-10 14:22:05 123456+00",
+      summary_text: "summary of research paper",
+      status: "completed"
+    },
+    {
+      id: 3,
+      title: "Meeting Notes",
+      created_at: "2025-03-05 09:15:30 654321+00",
+      summary_text: "summary of meeting notes",
+      status: "pending"
+    }
+  ];
   return (
     <main className="min-h-screen">
       <BgGradient />
@@ -32,7 +55,11 @@ export default function DashboardPage() {
               for unlimited uploads.
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 m:gap-6 md:grid-cols-2 lg:grid-cols-3 sm:px-0">{[...Array(uploadLimit).map((_, index) => <SummaryCard key={index} />)]}</div>
+          <div className="grid grid-cols-1 gap-4 m:gap-6 md:grid-cols-2 lg:grid-cols-3 sm:px-0">
+            {summaries.map((val, index) => (
+              <SummaryCard key={index} summary={val} />
+            ))}
+          </div>
         </div>
       </div>
     </main>
