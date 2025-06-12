@@ -31,7 +31,7 @@ export default function DashboardPage() {
   ];
   return (
     <main className="min-h-screen">
-      <BgGradient />
+      <BgGradient className="opacity-20" />
       <div className="container mx-auto flex flex-col gap-4">
         <div className="px-2 py-12 sm:py-24">
           <div className="flex gap-4 mb-8 justify-between">
