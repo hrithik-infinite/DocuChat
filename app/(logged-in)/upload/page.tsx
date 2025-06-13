@@ -1,4 +1,4 @@
-import BgGradient from "@/components/common/bg-gradient";
+import BgGradient from "@/components/common/BgGradient";
 import UploadForm from "@/components/upload/UploadForm";
 import UploadHeader from "@/components/upload/UploadHeader";
 
