@@ -2,7 +2,7 @@
 import { Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { deleteSummaryAction } from "@/actions/summary-actions";
 import { toast } from "sonner";
 
@@ -11,14 +11,17 @@ interface DeleteBtnProps {
 }
 export default function DeleteButton({ summaryId }: DeleteBtnProps) {
   const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const handleDelete = async () => {
-    const result = await deleteSummaryAction({ summaryId });
-    if (!result.success) {
-      toast.error("Error", {
-        description: "Failed to delete summary"
-      });
-    }
-    setOpen(false);
+    startTransition(async () => {
+      const result = await deleteSummaryAction({ summaryId });
+      if (!result.success) {
+        toast.error("Error", {
+          description: "Failed to delete summary"
+        });
+      }
+      setOpen(false);
+    });
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -37,7 +40,7 @@ export default function DeleteButton({ summaryId }: DeleteBtnProps) {
             Cancel
           </Button>
           <Button variant={"destructive"} className=" bg-gray-900 hover:bg-gray-600" onClick={handleDelete}>
-            Delete
+            {isPending ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>
