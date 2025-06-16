@@ -14,7 +14,7 @@ export default async function DashboardPage() {
   const summaries = await getSummaries(user?.id);
   return (
     <main className="min-h-screen">
-      <BgGradient className="opacity-20" />
+      <BgGradient className="opacity-30" />
       <div className="container mx-auto flex flex-col gap-4">
         <div className="px-2 py-12 sm:py-24">
           <div className="flex gap-4 mb-8 justify-between">
