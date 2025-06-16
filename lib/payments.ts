@@ -49,3 +49,14 @@ async function createPayment({ session, priceId, userEmail }: { session: Stripe.
     console.error("Error creating pament", e);
   }
 }
+
+export async function handleSubscriptionDeleted({ subscriptionId, stripe }: { subscriptionId: string; stripe: Stripe }) {
+  try {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const sql = await getDbConnection();
+    await sql`UPDATE users  SET status = 'cancelled' where customer_id = ${subscription.customer}`;
+  } catch (e) {
+    console.error("error in subscription dlete", e);
+    throw e;
+  }
+}
