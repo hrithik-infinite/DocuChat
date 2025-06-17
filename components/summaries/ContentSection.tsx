@@ -19,7 +19,7 @@ const RegularPoint = ({ point }: { point: string }) => {
     </div>
   );
 };
-export default function ContentSection({ title, points }: { title: string; points: string[] }) {
+export default function ContentSection({ points }: { points: string[] }) {
   return (
     <div className="space-y-4">
       {points.map((point, i) => {

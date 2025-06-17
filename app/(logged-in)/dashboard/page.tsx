@@ -12,7 +12,7 @@ import { redirect } from "next/navigation";
 export default async function DashboardPage() {
   const user = await currentUser();
   if (!user?.id) return redirect("/sign-in");
-  const { hasReachedLimit, uploadLimit } = await hasReachedUploadLimit(user?.id);
+  const { hasReachedLimit } = await hasReachedUploadLimit(user?.id);
   const summaries = await getSummaries(user?.id);
   return (
     <main className="min-h-screen">

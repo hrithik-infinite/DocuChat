@@ -19,7 +19,7 @@ export default function UploadForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { startUpload, routeConfig } = useUploadThing("pdfUploader", {
+  const { startUpload } = useUploadThing("pdfUploader", {
     onClientUploadComplete: () => {
       console.log("Uploaded successfully");
     },
@@ -29,7 +29,9 @@ export default function UploadForm() {
       });
       console.error(e);
     },
-    onUploadBegin: () => {}
+    onUploadBegin: (data) => {
+      console.log(data);
+    }
   });
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,18 +51,18 @@ export default function UploadForm() {
       toast.info("Uploading PDF", {
         description: "We are uploading your PDF"
       });
-      const resp = await startUpload([file]);
-      console.log("submitted", resp);
-      if (!resp) {
+      const uploadResp = await startUpload([file]);
+      console.log("submitted", uploadResp);
+      if (!uploadResp) {
         toast.error("Somethign went wrong!", {
-          description: " Please use a different file"
+          description: "Please use a different file"
         });
         setIsLoading(false);
 
         return;
       }
 
-      const uploadFileUrl = resp[0].serverData.file.url;
+      const uploadFileUrl = uploadResp[0].serverData.url;
       const formattedFileName = formatFileName(file.name);
       let storeResult;
 
@@ -80,7 +82,7 @@ export default function UploadForm() {
         description: "Hang tight! Our AI is reading through your document."
       });
 
-      const { data = null, message = null } = summaryResult || {};
+      const { data = null } = summaryResult || {};
 
       if (data?.summary) {
         storeResult = await storePdfSummaryAction({
