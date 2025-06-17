@@ -95,7 +95,7 @@ export default function UploadForm() {
   return (
     <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto">
       <UploadFormInput isLoading={isLoading} ref={formRef} onSubmit={handleSubmit} />
-      {(true || isLoading) && (
+      {isLoading && (
         <>
           <div className="relative">
             <div className="absolute inset-0 flex items-center" aria-hidden="true">
