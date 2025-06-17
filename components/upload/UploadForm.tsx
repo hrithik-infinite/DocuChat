@@ -3,10 +3,11 @@ import { useUploadThing } from "@/utils/uploadthing";
 import UploadFormInput from "./UploadFormInput";
 import { toast } from "sonner";
 import { z } from "zod";
-import { generatePdfSummary, storePdfSummaryAction } from "@/actions/upload-actions";
+import { generatePdfSummary, generatePdfText, storePdfSummaryAction } from "@/actions/upload-actions";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "./LoadingSkeleton";
+import { formatFileName } from "@/lib/utils";
 
 export default function UploadForm() {
   const schema = z.object({
@@ -58,31 +59,42 @@ export default function UploadForm() {
 
         return;
       }
-      toast.info("Processing PDF", {
+
+      const uploadFileUrl = resp[0].serverData.file.url;
+      const formattedFileName = formatFileName(file.name);
+      let storeResult;
+
+      const result = await generatePdfText({
+        pdfUrl: uploadFileUrl
+      });
+
+      toast.info("Generating PDF Summary", {
         description: "Hang tight! Our AI is reading through your document."
       });
 
-      const result = await generatePdfSummary(resp);
-      const { data = null, message = null } = result || {};
-      if (data) {
-        let storeResult;
-        toast.success("Saving PDF", {
-          description: "Hang tight! We are saving your summary!."
+      const summaryResult = await generatePdfSummary({
+        pdfText: result?.data?.pdfText ?? ""
+      });
+
+      toast.info("Saving PDF Summary", {
+        description: "Hang tight! Our AI is reading through your document."
+      });
+
+      const { data = null, message = null } = summaryResult || {};
+
+      if (data?.summary) {
+        storeResult = await storePdfSummaryAction({
+          fileUrl: uploadFileUrl,
+          summary: data.summary,
+          title: formattedFileName,
+          fileName: file.name
         });
-        if (data.summary) {
-          storeResult = await storePdfSummaryAction({
-            fileUrl: resp[0].serverData.file.url,
-            summary: data.summary,
-            title: data.title,
-            fileName: file.name
-          });
-          toast.success("Summary generated", {
-            description: "Your PDF has been successfullt summarized and saved"
-          });
-        }
-        formRef.current?.reset();
-        router.push(`/summaries/${storeResult?.data?.id}`);
+        toast.success("Summary generated", {
+          description: "Your PDF has been successfullt summarized and saved"
+        });
       }
+      formRef.current?.reset();
+      router.push(`/summaries/${storeResult?.data?.id}`);
     } catch (e) {
       setIsLoading(false);
 
