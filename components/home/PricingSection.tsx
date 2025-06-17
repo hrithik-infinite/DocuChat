@@ -1,37 +1,7 @@
 import { cn } from "@/lib/utils";
+import { plans, PricingType } from "@/utils/contants";
 import { CheckIcon } from "lucide-react";
 import Link from "next/link";
-
-type PricingType = {
-  id: string;
-  name: string;
-  description: string;
-  paymentLink: string;
-  priceId: string;
-  price: number;
-  items: string[];
-};
-
-const plans: PricingType[] = [
-  {
-    id: "basic",
-    name: "Basic",
-    description: "For occasional users",
-    paymentLink: "",
-    priceId: "",
-    price: 9,
-    items: ["5 PDF summaries per month", "Standard processing speed", "Email support"]
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    description: "For professionals and teams",
-    paymentLink: "",
-    priceId: "",
-    price: 19,
-    items: ["Unlimited PDF summaries", "Priority processing", "24/7 priority support", "Markdown export"]
-  }
-];
 
 const PricingCard = ({ name, price, description, items, id, paymentLink }: PricingType) => {
   return (
