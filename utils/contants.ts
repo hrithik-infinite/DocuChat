@@ -8,13 +8,13 @@ export type PricingType = {
   items: string[];
 };
 const isDev = process.env.NODE_ENV === "development";
-export const ORIGIN_URL = isDev ? "http://localhost:3000/" : "https://docuchat-hrithik.vercel.app/";
+export const ORIGIN_URL = isDev ? "http://localhost:3000" : "https://docuchat-hrithik.vercel.app";
 export const plans: PricingType[] = [
   {
     id: "basic",
     name: "Free",
     description: "For occasional users",
-    paymentLink: `${ORIGIN_URL}upload`,
+    paymentLink: `${ORIGIN_URL}/upload`,
     priceId: "free",
     price: 0,
     items: ["5 PDF summaries per month", "Standard processing speed", "Email support"]
