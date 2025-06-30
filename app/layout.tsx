@@ -5,6 +5,7 @@ import Header from "@/components/common/header";
 import Footer from "@/components/common/footer";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
+import { ORIGIN_URL } from "@/utils/contants";
 
 const fontSans = FontSans({
   variable: "--font-sans",
@@ -14,7 +15,18 @@ const fontSans = FontSans({
 
 export const metadata: Metadata = {
   title: "DocuChat - AI-powered PDF summarization",
-  description: "Save hours of reading time. Transform lengthy PDFs into clear, accurate summaries in seconds with our advanced AI technology."
+  description: "Save hours of reading time. Transform lengthy PDFs into clear, accurate summaries in seconds with our advanced AI technology.",
+  openGraph: {
+    images: [
+      {
+        url: "./opengraph-image.png"
+      }
+    ]
+  },
+  metadataBase: new URL(ORIGIN_URL),
+  alternates: {
+    canonical: ORIGIN_URL
+  }
 };
 
 export default function RootLayout({
