@@ -36,7 +36,7 @@ DocuChat is an AI-powered platform that transforms your PDFs into clear, actiona
 - 💳 **Stripe** for subscription management, cancellations and secure payment processing
 - 🔔 **Toast notifications** for user feedback
 - 📜 **TypeScript** for static typing and enhanced development experience
-- 💅 **TailwindCSS 4** for utility-first, responsive styling (also learn to upgrade to Tailwind v4)
+- 💅 **TailwindCSS 4** for utility-first, responsive styling
 - 🚀 **Deployment on Vercel**
 
 ---
