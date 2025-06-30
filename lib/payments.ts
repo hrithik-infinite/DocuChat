@@ -42,7 +42,7 @@ async function createPayment({ session, priceId, userEmail }: { session: Stripe.
   try {
     const sql = await getDbConnection();
     const { amount_total, id, status } = session;
-    await sql`INSERT INTO payments (amount, status, stripe_payment_id, price_id, user_mail) VALUES (
+    await sql`INSERT INTO payments (amount, status, stripe_payment_id, price_id, user_email) VALUES (
             ${amount_total}, ${status}, ${id} , ${priceId}, ${userEmail}
         )`;
   } catch (e) {
