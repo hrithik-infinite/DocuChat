@@ -27,7 +27,7 @@ export async function handleCheckoutSessionCompleted({ session, stripe }: { sess
 async function createOrUpdateUser({ email, fullName, customerId, priceId, status }: { email: string; fullName: string; customerId: string; priceId: string; status: string }) {
   try {
     const sql = await getDbConnection();
-    const user = await sql`SEELCT * FROM users WHERE email = ${email}`;
+    const user = await sql`SELCT * FROM users WHERE email = ${email}`;
     if (user.length === 0) {
       await sql`INSERT INTO USERS (email, full_name ,customer_id, price_id, status)
         VALUES
