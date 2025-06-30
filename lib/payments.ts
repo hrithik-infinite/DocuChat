@@ -29,7 +29,7 @@ async function createOrUpdateUser({ email, fullName, customerId, priceId, status
     const sql = await getDbConnection();
     const user = await sql`SELECT * FROM users WHERE email = ${email}`;
     if (user.length === 0) {
-      await sql`INSERT INTO USERS (email, full_name ,customer_id, price_id, status)
+      await sql`INSERT INTO users (email, full_name ,customer_id, price_id, status)
         VALUES
         (${email}, ${fullName}, ${customerId}, ${priceId}, ${status})`;
     }
@@ -42,7 +42,7 @@ async function createPayment({ session, priceId, userEmail }: { session: Stripe.
   try {
     const sql = await getDbConnection();
     const { amount_total, id, status } = session;
-    await sql`INSERT INTO payments (amount, status, stripe_payment_id, price_id, user_mail) VALUE (
+    await sql`INSERT INTO payments (amount, status, stripe_payment_id, price_id, user_mail) VALUES (
             ${amount_total}, ${status}, ${id} , ${priceId}, ${userEmail}
         )`;
   } catch (e) {
@@ -54,7 +54,7 @@ export async function handleSubscriptionDeleted({ subscriptionId, stripe }: { su
   try {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
     const sql = await getDbConnection();
-    await sql`UPDATE users  SET status = 'cancelled' where customer_id = ${subscription.customer}`;
+    await sql`UPDATE users SET status = 'cancelled' where customer_id = ${subscription.customer}`;
   } catch (e) {
     console.error("error in subscription dlete", e);
     throw e;
