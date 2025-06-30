@@ -8,25 +8,24 @@ export type PricingType = {
   items: string[];
 };
 const isDev = process.env.NODE_ENV === "development";
+export const ORIGIN_URL = isDev ? "http://localhost:3000/" : "https://docuchat-hrithik.vercel.app/";
 export const plans: PricingType[] = [
   {
     id: "basic",
-    name: "Basic",
+    name: "Free",
     description: "For occasional users",
-    paymentLink: isDev ? "https://buy.stripe.com/test_6oU5kF9vEgst99gcCvefC01" : "",
-    priceId: isDev ? "price_1RaF4TSHV5FsgvHgLpuuzVlL" : "",
-    price: 9,
+    paymentLink: `${ORIGIN_URL}upload`,
+    priceId: "free",
+    price: 0,
     items: ["5 PDF summaries per month", "Standard processing speed", "Email support"]
   },
   {
     id: "pro",
     name: "Pro",
     description: "For professionals and teams",
-    paymentLink: isDev ? "https://buy.stripe.com/test_dRmaEZ8rAb89cls45ZefC00" : "",
-    priceId: isDev ? "price_1RaF4jSHV5FsgvHgD5ke40Oe" : "",
-    price: 19,
+    paymentLink: "https://buy.stripe.com/test_5kQ3cx37q1Mt18TaKx5EY00",
+    priceId: isDev ? "price_1RaF4jSHV5FsgvHgD5ke40Oe" : "price_1RfkBzSIKaHu1g8JLv1yploN",
+    price: 299,
     items: ["Unlimited PDF summaries", "Priority processing", "24/7 priority support", "Markdown export"]
   }
 ];
-
-export const ORIGIN_URL = isDev ? "http://localhost:3000/" : "";

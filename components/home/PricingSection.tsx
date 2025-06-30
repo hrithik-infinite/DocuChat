@@ -15,9 +15,9 @@ const PricingCard = ({ name, price, description, items, id, paymentLink }: Prici
         </div>
 
         <div className="flex gap-2">
-          <p className="text-5xl tracking-tight font-extrabold">${price}</p>
+          <p className="text-5xl tracking-tight font-extrabold">₹ {price}</p>
           <div className="flex flex-col justify-end mb-[4px]">
-            <p className="text-xs uppercase font-semibold">USD</p>
+            <p className="text-xs uppercase font-semibold">INR</p>
             <p className="text-xs">/month</p>
           </div>
         </div>
@@ -38,7 +38,7 @@ const PricingCard = ({ name, price, description, items, id, paymentLink }: Prici
               "w-full rounded-full flex items-center justify-center gap-2 bg-linear-to-r from-rose-800 to-rose-500 hover:from-rose-500 hover:to-rose-800 text-white border-2 py-2",
               id === "pro" ? "border-rose-900" : "border-rose-100 from-rose-400 to-rose-500"
             )}>
-            Buy Now
+            {id === "basic" ? "Try Now" : "Buy Now"}
           </Link>
         </div>
       </div>
