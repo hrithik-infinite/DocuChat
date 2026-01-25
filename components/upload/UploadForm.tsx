@@ -4,25 +4,37 @@ import UploadFormInput from "./UploadFormInput";
 import TemplateSelector from "./TemplateSelector";
 import { toast } from "sonner";
 import { z } from "zod";
-import { generatePdfSummary, generatePdfText, storePdfSummaryAction } from "@/actions/upload-actions";
+import { generatePdfSummary, generateDocumentText, storePdfSummaryAction } from "@/actions/upload-actions";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "./LoadingSkeleton";
 import { formatFileName } from "@/lib/utils";
 import { SummaryTemplate, DEFAULT_TEMPLATE } from "@/types/templates";
 
+const SUPPORTED_MIME_TYPES = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "text/plain",
+  "text/markdown",
+] as const;
+
 export default function UploadForm() {
   const schema = z.object({
     file: z
       .instanceof(File, { message: "Please upload a file." })
       .refine((file) => file.size <= 5 * 1024 * 1024, { message: "File size must be less than 5 MB." })
-      .refine((file) => file.type === "application/pdf", { message: "File must be a PDF." })
+      .refine(
+        (file) => SUPPORTED_MIME_TYPES.includes(file.type as typeof SUPPORTED_MIME_TYPES[number]),
+        { message: "Unsupported file type. Please upload PDF, Word, Excel, PowerPoint, or text files." }
+      )
   });
   const formRef = useRef<HTMLFormElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<SummaryTemplate>(DEFAULT_TEMPLATE);
   const router = useRouter();
-  const { startUpload } = useUploadThing("pdfUploader", {
+  const { startUpload } = useUploadThing("documentUploader", {
     onClientUploadComplete: () => {
       console.log("Uploaded successfully");
     },
@@ -51,13 +63,13 @@ export default function UploadForm() {
         setIsLoading(false);
         return;
       }
-      toast.info("Uploading PDF", {
-        description: "We are uploading your PDF"
+      toast.info("Uploading document", {
+        description: "We are uploading your document"
       });
       const uploadResp = await startUpload([file]);
       console.log("submitted", uploadResp);
       if (!uploadResp) {
-        toast.error("Somethign went wrong!", {
+        toast.error("Something went wrong!", {
           description: "Please use a different file"
         });
         setIsLoading(false);
@@ -65,25 +77,40 @@ export default function UploadForm() {
         return;
       }
 
-      const uploadFileUrl = uploadResp[0].serverData.url;
+      const uploadFileUrl = uploadResp[0].serverData?.url || uploadResp[0].ufsUrl;
+      const uploadFileType = uploadResp[0].serverData?.type || uploadResp[0].type || file.type;
       const formattedFileName = formatFileName(file.name);
       let storeResult;
 
-      const result = await generatePdfText({
-        pdfUrl: uploadFileUrl
+      toast.info("Extracting text", {
+        description: "Reading your document content..."
       });
 
-      toast.info("Generating PDF Summary", {
+      const result = await generateDocumentText({
+        fileUrl: uploadFileUrl,
+        fileName: file.name,
+        fileType: uploadFileType
+      });
+
+      if (!result.success || !result.data?.documentText) {
+        toast.error("Failed to extract text", {
+          description: result.message || "Could not read the document"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      toast.info("Generating summary", {
         description: "Hang tight! Our AI is reading through your document."
       });
 
       const summaryResult = await generatePdfSummary({
-        pdfText: result?.data?.pdfText ?? "",
+        pdfText: result.data.documentText,
         template: selectedTemplate
       });
 
-      toast.info("Saving PDF Summary", {
-        description: "Hang tight! Our AI is reading through your document."
+      toast.info("Saving summary", {
+        description: "Almost done!"
       });
 
       const { data = null } = summaryResult || {};
@@ -96,7 +123,7 @@ export default function UploadForm() {
           fileName: file.name
         });
         toast.success("Summary generated", {
-          description: "Your PDF has been successfullt summarized and saved"
+          description: "Your document has been successfully summarized and saved"
         });
       }
       formRef.current?.reset();

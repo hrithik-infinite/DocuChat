@@ -4,6 +4,7 @@ import { withAuth } from "@workos-inc/authkit-nextjs";
 
 const f = createUploadthing();
 export const ourFileRouter = {
+  // Keep legacy PDF uploader for backwards compatibility
   pdfUploader: f({
     pdf: { maxFileSize: "4MB" }
   })
@@ -18,6 +19,29 @@ export const ourFileRouter = {
         userId: metadata.userId,
         name: file.name,
         url: file.ufsUrl
+      };
+    }),
+
+  // New multi-format document uploader
+  documentUploader: f({
+    pdf: { maxFileSize: "4MB" },
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": { maxFileSize: "4MB" },
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": { maxFileSize: "4MB" },
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": { maxFileSize: "4MB" },
+    "text/plain": { maxFileSize: "1MB" },
+    "text/markdown": { maxFileSize: "1MB" },
+  })
+    .middleware(async () => {
+      const { user } = await withAuth();
+      if (!user) throw new UploadThingError("Unauthorized");
+      return { userId: user.id };
+    })
+    .onUploadComplete(({ metadata, file }) => {
+      console.log("document upload completed for user id:", metadata.userId);
+      return {
+        url: file.ufsUrl,
+        name: file.name,
+        type: file.type
       };
     })
 } satisfies FileRouter;

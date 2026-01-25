@@ -4,7 +4,7 @@ export default authkitMiddleware({
   redirectUri: process.env.NEXT_PUBLIC_WORKOS_REDIRECT_URI,
   middlewareAuth: {
     enabled: true,
-    unauthenticatedPaths: ["/", "/sign-in", "/sign-up", "/login", "/callback"],
+    unauthenticatedPaths: ["/", "/sign-in", "/sign-up", "/login", "/callback", "/api/:path*"],
   },
 });
 

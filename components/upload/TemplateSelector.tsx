@@ -1,6 +1,6 @@
 "use client";
 
-import { SummaryTemplate, TEMPLATES, DEFAULT_TEMPLATE } from "@/types/templates";
+import { SummaryTemplate, TEMPLATES } from "@/types/templates";
 import { Briefcase, FileText, GraduationCap, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 

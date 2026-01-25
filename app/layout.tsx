@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     shortcut: "./icon.ico",
     apple: "./icon.ico"
   },
-  keywords: ["AI PDF Summarizer", "PDF Summary", "DocuChat", "AI Document Summarization", "PDF to Summary", "OpenAI", "GPT-4", "Langchain"],
+  keywords: ["AI PDF Summarizer", "PDF Summary", "DocuChat", "AI Document Summarization", "PDF to Summary", "Claude", "Anthropic"],
   authors: [{ name: "Hrithik Agarwal", url: ORIGIN_URL }],
   creator: "Hrithik Agarwal"
 };

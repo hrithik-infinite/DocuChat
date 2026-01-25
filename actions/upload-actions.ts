@@ -2,6 +2,7 @@
 
 import { getDbConnection } from "@/lib/db";
 import { fetchAndExtractPdfText } from "@/lib/langchain";
+import { extractTextFromDocument, getFileTypeFromExtension, type SupportedFileType } from "@/lib/document-parser";
 import { generateSummaryFromClaude } from "@/lib/claude";
 import { SummaryTemplate, DEFAULT_TEMPLATE } from "@/types/templates";
 import { withAuth } from "@workos-inc/authkit-nextjs";
@@ -52,6 +53,66 @@ export async function generatePdfText({ pdfUrl }: { pdfUrl: string }) {
     };
   } catch (err) {
     console.error("Error in generatePdfSummary:", err);
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : String(err),
+      data: null
+    };
+  }
+}
+
+export async function generateDocumentText({
+  fileUrl,
+  fileName,
+  fileType
+}: {
+  fileUrl: string;
+  fileName: string;
+  fileType?: string;
+}) {
+  console.log("generateDocumentText called with:", { fileUrl, fileName, fileType });
+
+  if (!fileUrl) {
+    return {
+      success: false,
+      message: "File upload failed",
+      data: null
+    };
+  }
+
+  try {
+    // Determine file type from MIME type or extension
+    const detectedType = (fileType as SupportedFileType) || getFileTypeFromExtension(fileName);
+
+    if (!detectedType) {
+      return {
+        success: false,
+        message: "Unsupported file type",
+        data: null
+      };
+    }
+
+    console.log("Extracting text from document:", detectedType);
+    const documentText = await extractTextFromDocument(fileUrl, detectedType);
+    console.log("Extracted document text length:", documentText?.length);
+
+    if (!documentText) {
+      return {
+        success: false,
+        message: "Failed to extract text from document",
+        data: null
+      };
+    }
+
+    return {
+      success: true,
+      message: "Document text extracted successfully",
+      data: {
+        documentText
+      }
+    };
+  } catch (err) {
+    console.error("Error in generateDocumentText:", err);
     return {
       success: false,
       message: err instanceof Error ? err.message : String(err),
