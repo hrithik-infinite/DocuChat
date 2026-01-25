@@ -1,6 +1,6 @@
 import { UploadThingError } from "uploadthing/server";
 import { type FileRouter, createUploadthing } from "uploadthing/next";
-import { currentUser } from "@clerk/nextjs/server";
+import { withAuth } from "@workos-inc/authkit-nextjs";
 
 const f = createUploadthing();
 export const ourFileRouter = {
@@ -8,7 +8,7 @@ export const ourFileRouter = {
     pdf: { maxFileSize: "4MB" }
   })
     .middleware(async () => {
-      const user = await currentUser();
+      const { user } = await withAuth();
       if (!user) throw new UploadThingError("Unauthorized");
       return { userId: user.id };
     })

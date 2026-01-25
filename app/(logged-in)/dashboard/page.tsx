@@ -4,16 +4,15 @@ import SummaryCard from "@/components/summaries/SummaryCard";
 import { Button } from "@/components/ui/button";
 import { getSummaries } from "@/lib/summaries";
 import { hasReachedUploadLimit } from "@/utils/user";
-import { currentUser } from "@clerk/nextjs/server";
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import { ArrowRight, Plus } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
-  const user = await currentUser();
-  if (!user?.id) return redirect("/sign-in");
-  const { hasReachedLimit } = await hasReachedUploadLimit(user?.id);
-  const summaries = await getSummaries(user?.id);
+  // Layout ensures user is signed in, so user is guaranteed to exist
+  const { user } = await withAuth({ ensureSignedIn: true });
+  const { hasReachedLimit } = await hasReachedUploadLimit(user.id);
+  const summaries = await getSummaries(user.id);
   return (
     <main className="min-h-screen">
       <BgGradient className="opacity-30" />

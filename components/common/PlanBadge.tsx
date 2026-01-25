@@ -1,14 +1,14 @@
 import { plans } from "@/utils/contants";
 import { getPriceId } from "@/utils/user";
-import { currentUser } from "@clerk/nextjs/server";
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import { Badge } from "../ui/badge";
 import { Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default async function PlanBadge() {
-  const user = await currentUser();
+  const { user } = await withAuth({ ensureSignedIn: false });
   if (!user?.id) return null;
-  const email = user?.emailAddresses?.[0]?.emailAddress;
+  const email = user?.email;
   let priceId: string | null = null;
   if (email) {
     priceId = await getPriceId(email);

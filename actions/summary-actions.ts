@@ -1,12 +1,12 @@
 "use server";
 
 import { getDbConnection } from "@/lib/db";
-import { currentUser } from "@clerk/nextjs/server";
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import { revalidatePath } from "next/cache";
 
 export async function deleteSummaryAction({ summaryId }: { summaryId: string }) {
   try {
-    const user = await currentUser();
+    const { user } = await withAuth();
     const userId = user?.id;
     if (!userId) {
       throw new Error("User not found");

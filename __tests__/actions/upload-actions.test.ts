@@ -9,12 +9,12 @@ vi.mock("@/lib/langchain", () => ({
   fetchAndExtractPdfText: vi.fn(),
 }));
 
-vi.mock("@/lib/openai", () => ({
-  generateSummaryFromOpenAI: vi.fn(),
+vi.mock("@/lib/claude", () => ({
+  generateSummaryFromClaude: vi.fn(),
 }));
 
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: vi.fn(),
+vi.mock("@workos-inc/authkit-nextjs", () => ({
+  withAuth: vi.fn(),
 }));
 
 vi.mock("next/cache", () => ({
@@ -24,14 +24,14 @@ vi.mock("next/cache", () => ({
 import { generatePdfText, generatePdfSummary, storePdfSummaryAction } from "@/actions/upload-actions";
 import { getDbConnection } from "@/lib/db";
 import { fetchAndExtractPdfText } from "@/lib/langchain";
-import { generateSummaryFromOpenAI } from "@/lib/openai";
-import { auth } from "@clerk/nextjs/server";
+import { generateSummaryFromClaude } from "@/lib/claude";
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import { revalidatePath } from "next/cache";
 
 const mockGetDbConnection = vi.mocked(getDbConnection);
 const mockFetchAndExtractPdfText = vi.mocked(fetchAndExtractPdfText);
-const mockGenerateSummaryFromOpenAI = vi.mocked(generateSummaryFromOpenAI);
-const mockAuth = vi.mocked(auth);
+const mockGenerateSummaryFromClaude = vi.mocked(generateSummaryFromClaude);
+const mockGetUser = vi.mocked(withAuth);
 const mockRevalidatePath = vi.mocked(revalidatePath);
 
 describe("generatePdfText", () => {
@@ -111,18 +111,18 @@ describe("generatePdfSummary", () => {
 
   it("should successfully generate summary from PDF text", async () => {
     const mockSummary = "This is a generated summary";
-    mockGenerateSummaryFromOpenAI.mockResolvedValue(mockSummary);
+    mockGenerateSummaryFromClaude.mockResolvedValue(mockSummary);
 
     const result = await generatePdfSummary({ pdfText: "Some PDF content" });
 
-    expect(mockGenerateSummaryFromOpenAI).toHaveBeenCalledWith("Some PDF content");
+    expect(mockGenerateSummaryFromClaude).toHaveBeenCalledWith("Some PDF content", "detailed");
     expect(result.success).toBe(true);
     expect(result.message).toBe("Summary generated successfully");
     expect(result.data).toEqual({ summary: mockSummary });
   });
 
   it("should return failure when summary generation returns empty", async () => {
-    mockGenerateSummaryFromOpenAI.mockResolvedValue("");
+    mockGenerateSummaryFromClaude.mockResolvedValue("");
 
     const result = await generatePdfSummary({ pdfText: "Some PDF content" });
 
@@ -131,19 +131,19 @@ describe("generatePdfSummary", () => {
     expect(result.data).toBeNull();
   });
 
-  it("should return failure when OpenAI throws error", async () => {
-    mockGenerateSummaryFromOpenAI.mockRejectedValue(new Error("OpenAI API error"));
+  it("should return failure when Claude throws error", async () => {
+    mockGenerateSummaryFromClaude.mockRejectedValue(new Error("Claude API error"));
 
     const result = await generatePdfSummary({ pdfText: "Some PDF content" });
 
     expect(result.success).toBe(false);
     expect(result.message).toBe("Failed to generate Summary");
     expect(result.data).toBeNull();
-    expect(console.error).toHaveBeenCalledWith("Error generating summary from OpenAI:", expect.any(Error));
+    expect(console.error).toHaveBeenCalledWith("Error generating summary from Claude:", expect.any(Error));
   });
 
   it("should return failure when summary is null", async () => {
-    mockGenerateSummaryFromOpenAI.mockResolvedValue(null as unknown as string);
+    mockGenerateSummaryFromClaude.mockResolvedValue(null as unknown as string);
 
     const result = await generatePdfSummary({ pdfText: "Some PDF content" });
 
@@ -152,11 +152,11 @@ describe("generatePdfSummary", () => {
   });
 
   it("should log summary generation progress", async () => {
-    mockGenerateSummaryFromOpenAI.mockResolvedValue("Summary");
+    mockGenerateSummaryFromClaude.mockResolvedValue("Summary");
 
     await generatePdfSummary({ pdfText: "Some content" });
 
-    expect(console.log).toHaveBeenCalledWith("Generating summary from OpenAI...");
+    expect(console.log).toHaveBeenCalledWith("Generating summary from Claude...");
     expect(console.log).toHaveBeenCalledWith("Summary generated:");
   });
 });
@@ -169,7 +169,7 @@ describe("storePdfSummaryAction", () => {
   });
 
   it("should return failure when user is not authenticated", async () => {
-    mockAuth.mockResolvedValue({ userId: null } as ReturnType<typeof auth> extends Promise<infer T> ? T : never);
+    mockGetUser.mockResolvedValue({ user: null } as any);
 
     const result = await storePdfSummaryAction({
       fileUrl: "https://example.com/file.pdf",
@@ -183,7 +183,7 @@ describe("storePdfSummaryAction", () => {
   });
 
   it("should successfully save PDF summary", async () => {
-    mockAuth.mockResolvedValue({ userId: "user-123" } as ReturnType<typeof auth> extends Promise<infer T> ? T : never);
+    mockGetUser.mockResolvedValue({ user: { id: "user-123" } } as any);
     const mockSavedSummary = { id: "summary-456", summary_text: "Test summary" };
     const mockSql = vi.fn().mockResolvedValue([mockSavedSummary]);
     mockGetDbConnection.mockResolvedValue(mockSql as unknown as ReturnType<typeof getDbConnection> extends Promise<infer T> ? T : never);
@@ -202,7 +202,7 @@ describe("storePdfSummaryAction", () => {
   });
 
   it("should return failure when save returns empty result", async () => {
-    mockAuth.mockResolvedValue({ userId: "user-123" } as ReturnType<typeof auth> extends Promise<infer T> ? T : never);
+    mockGetUser.mockResolvedValue({ user: { id: "user-123" } } as any);
     const mockSql = vi.fn().mockResolvedValue([undefined]);
     mockGetDbConnection.mockResolvedValue(mockSql as unknown as ReturnType<typeof getDbConnection> extends Promise<infer T> ? T : never);
 
@@ -218,7 +218,7 @@ describe("storePdfSummaryAction", () => {
   });
 
   it("should handle database errors", async () => {
-    mockAuth.mockResolvedValue({ userId: "user-123" } as ReturnType<typeof auth> extends Promise<infer T> ? T : never);
+    mockGetUser.mockResolvedValue({ user: { id: "user-123" } } as any);
     const mockError = new Error("Database connection failed");
     mockGetDbConnection.mockRejectedValue(mockError);
 
@@ -234,7 +234,7 @@ describe("storePdfSummaryAction", () => {
   });
 
   it("should handle non-Error thrown values", async () => {
-    mockAuth.mockResolvedValue({ userId: "user-123" } as ReturnType<typeof auth> extends Promise<infer T> ? T : never);
+    mockGetUser.mockResolvedValue({ user: { id: "user-123" } } as any);
     mockGetDbConnection.mockRejectedValue("String error");
 
     const result = await storePdfSummaryAction({
@@ -249,7 +249,7 @@ describe("storePdfSummaryAction", () => {
   });
 
   it("should call database with correct parameters", async () => {
-    mockAuth.mockResolvedValue({ userId: "user-123" } as ReturnType<typeof auth> extends Promise<infer T> ? T : never);
+    mockGetUser.mockResolvedValue({ user: { id: "user-123" } } as any);
     const mockSavedSummary = { id: "summary-789", summary_text: "Summary text" };
     const mockSql = vi.fn().mockResolvedValue([mockSavedSummary]);
     mockGetDbConnection.mockResolvedValue(mockSql as unknown as ReturnType<typeof getDbConnection> extends Promise<infer T> ? T : never);
@@ -266,7 +266,7 @@ describe("storePdfSummaryAction", () => {
   });
 
   it("should handle query execution error", async () => {
-    mockAuth.mockResolvedValue({ userId: "user-123" } as ReturnType<typeof auth> extends Promise<infer T> ? T : never);
+    mockGetUser.mockResolvedValue({ user: { id: "user-123" } } as any);
     const mockSql = vi.fn().mockRejectedValue(new Error("Query failed"));
     mockGetDbConnection.mockResolvedValue(mockSql as unknown as ReturnType<typeof getDbConnection> extends Promise<infer T> ? T : never);
 

@@ -2,14 +2,14 @@ import BgGradient from "@/components/common/BgGradient";
 import UploadForm from "@/components/upload/UploadForm";
 import UploadHeader from "@/components/upload/UploadHeader";
 import { hasReachedUploadLimit } from "@/utils/user";
-import { currentUser } from "@clerk/nextjs/server";
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
-  const user = await currentUser();
-  if (!user?.id) redirect("/sign-in");
+  // Layout ensures user is signed in, so user is guaranteed to exist
+  const { user } = await withAuth({ ensureSignedIn: true });
 
-  const { hasReachedLimit } = await hasReachedUploadLimit(user?.id);
+  const { hasReachedLimit } = await hasReachedUploadLimit(user.id);
   if (hasReachedLimit) redirect("/dashboard");
   return (
     <section className="min-h-screen">

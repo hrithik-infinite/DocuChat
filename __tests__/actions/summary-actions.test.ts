@@ -6,8 +6,8 @@ vi.mock("@/lib/db", () => ({
   getDbConnection: vi.fn(),
 }));
 
-vi.mock("@clerk/nextjs/server", () => ({
-  currentUser: vi.fn(),
+vi.mock("@workos-inc/authkit-nextjs", () => ({
+  withAuth: vi.fn(),
 }));
 
 vi.mock("next/cache", () => ({
@@ -16,7 +16,7 @@ vi.mock("next/cache", () => ({
 
 // Import mocked modules
 import { getDbConnection } from "@/lib/db";
-import { currentUser } from "@clerk/nextjs/server";
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import { revalidatePath } from "next/cache";
 
 describe("deleteSummaryAction", () => {
@@ -33,7 +33,7 @@ describe("deleteSummaryAction", () => {
   describe("successful deletion", () => {
     it("should successfully delete a summary when user is authenticated and summary exists", async () => {
       // Setup mocks
-      vi.mocked(currentUser).mockResolvedValue({ id: mockUserId } as any);
+      vi.mocked(withAuth).mockResolvedValue({ user: { id: mockUserId } } as any);
       vi.mocked(getDbConnection).mockResolvedValue(mockSql as any);
       mockSql.mockResolvedValue([{ id: mockSummaryId }]);
 
@@ -42,14 +42,14 @@ describe("deleteSummaryAction", () => {
 
       // Verify
       expect(result).toEqual({ success: true });
-      expect(currentUser).toHaveBeenCalledTimes(1);
+      expect(withAuth).toHaveBeenCalledTimes(1);
       expect(getDbConnection).toHaveBeenCalledTimes(1);
       expect(mockSql).toHaveBeenCalledTimes(1);
       expect(revalidatePath).toHaveBeenCalledWith("/dashboard");
     });
 
     it("should call the database with correct parameters", async () => {
-      vi.mocked(currentUser).mockResolvedValue({ id: mockUserId } as any);
+      vi.mocked(withAuth).mockResolvedValue({ user: { id: mockUserId } } as any);
       vi.mocked(getDbConnection).mockResolvedValue(mockSql as any);
       mockSql.mockResolvedValue([{ id: mockSummaryId }]);
 
@@ -64,19 +64,19 @@ describe("deleteSummaryAction", () => {
   });
 
   describe("user not found (no auth)", () => {
-    it("should return failure when currentUser returns null", async () => {
-      vi.mocked(currentUser).mockResolvedValue(null);
+    it("should return failure when withAuth returns null user", async () => {
+      vi.mocked(withAuth).mockResolvedValue({ user: null } as any);
 
       const result = await deleteSummaryAction({ summaryId: mockSummaryId });
 
       expect(result).toEqual({ success: false });
-      expect(currentUser).toHaveBeenCalledTimes(1);
+      expect(withAuth).toHaveBeenCalledTimes(1);
       expect(getDbConnection).not.toHaveBeenCalled();
       expect(revalidatePath).not.toHaveBeenCalled();
     });
 
     it("should return failure when user has no id", async () => {
-      vi.mocked(currentUser).mockResolvedValue({ id: undefined } as any);
+      vi.mocked(withAuth).mockResolvedValue({ user: { id: undefined } } as any);
 
       const result = await deleteSummaryAction({ summaryId: mockSummaryId });
 
@@ -87,7 +87,7 @@ describe("deleteSummaryAction", () => {
 
     it("should log error when user is not found", async () => {
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      vi.mocked(currentUser).mockResolvedValue(null);
+      vi.mocked(withAuth).mockResolvedValue({ user: null } as any);
 
       await deleteSummaryAction({ summaryId: mockSummaryId });
 
@@ -100,7 +100,7 @@ describe("deleteSummaryAction", () => {
 
   describe("summary not found (no matching record)", () => {
     it("should return failure when no summary matches the given id", async () => {
-      vi.mocked(currentUser).mockResolvedValue({ id: mockUserId } as any);
+      vi.mocked(withAuth).mockResolvedValue({ user: { id: mockUserId } } as any);
       vi.mocked(getDbConnection).mockResolvedValue(mockSql as any);
       mockSql.mockResolvedValue([]); // Empty result - no matching record
 
@@ -111,7 +111,7 @@ describe("deleteSummaryAction", () => {
     });
 
     it("should return failure when summary belongs to different user", async () => {
-      vi.mocked(currentUser).mockResolvedValue({ id: mockUserId } as any);
+      vi.mocked(withAuth).mockResolvedValue({ user: { id: mockUserId } } as any);
       vi.mocked(getDbConnection).mockResolvedValue(mockSql as any);
       // Database returns empty because user_id doesn't match
       mockSql.mockResolvedValue([]);
@@ -126,7 +126,7 @@ describe("deleteSummaryAction", () => {
   describe("database error handling", () => {
     it("should return failure when getDbConnection throws an error", async () => {
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      vi.mocked(currentUser).mockResolvedValue({ id: mockUserId } as any);
+      vi.mocked(withAuth).mockResolvedValue({ user: { id: mockUserId } } as any);
       vi.mocked(getDbConnection).mockRejectedValue(new Error("Database connection failed"));
 
       const result = await deleteSummaryAction({ summaryId: mockSummaryId });
@@ -141,7 +141,7 @@ describe("deleteSummaryAction", () => {
 
     it("should return failure when SQL query throws an error", async () => {
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      vi.mocked(currentUser).mockResolvedValue({ id: mockUserId } as any);
+      vi.mocked(withAuth).mockResolvedValue({ user: { id: mockUserId } } as any);
       vi.mocked(getDbConnection).mockResolvedValue(mockSql as any);
       mockSql.mockRejectedValue(new Error("SQL execution failed"));
 
@@ -155,9 +155,9 @@ describe("deleteSummaryAction", () => {
       expect(revalidatePath).not.toHaveBeenCalled();
     });
 
-    it("should return failure when currentUser throws an error", async () => {
+    it("should return failure when withAuth throws an error", async () => {
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      vi.mocked(currentUser).mockRejectedValue(new Error("Auth service unavailable"));
+      vi.mocked(withAuth).mockRejectedValue(new Error("Auth service unavailable"));
 
       const result = await deleteSummaryAction({ summaryId: mockSummaryId });
 
@@ -170,7 +170,7 @@ describe("deleteSummaryAction", () => {
     });
 
     it("should handle unexpected database response gracefully", async () => {
-      vi.mocked(currentUser).mockResolvedValue({ id: mockUserId } as any);
+      vi.mocked(withAuth).mockResolvedValue({ user: { id: mockUserId } } as any);
       vi.mocked(getDbConnection).mockResolvedValue(mockSql as any);
       // Return undefined instead of an array
       mockSql.mockResolvedValue(undefined);
@@ -184,7 +184,7 @@ describe("deleteSummaryAction", () => {
 
   describe("edge cases", () => {
     it("should handle empty summaryId", async () => {
-      vi.mocked(currentUser).mockResolvedValue({ id: mockUserId } as any);
+      vi.mocked(withAuth).mockResolvedValue({ user: { id: mockUserId } } as any);
       vi.mocked(getDbConnection).mockResolvedValue(mockSql as any);
       mockSql.mockResolvedValue([]);
 
@@ -194,7 +194,7 @@ describe("deleteSummaryAction", () => {
     });
 
     it("should handle special characters in summaryId", async () => {
-      vi.mocked(currentUser).mockResolvedValue({ id: mockUserId } as any);
+      vi.mocked(withAuth).mockResolvedValue({ user: { id: mockUserId } } as any);
       vi.mocked(getDbConnection).mockResolvedValue(mockSql as any);
       mockSql.mockResolvedValue([{ id: "special-id-!@#$%" }]);
 
@@ -206,7 +206,7 @@ describe("deleteSummaryAction", () => {
 
     it("should only revalidate path on successful deletion", async () => {
       // First call - success
-      vi.mocked(currentUser).mockResolvedValue({ id: mockUserId } as any);
+      vi.mocked(withAuth).mockResolvedValue({ user: { id: mockUserId } } as any);
       vi.mocked(getDbConnection).mockResolvedValue(mockSql as any);
       mockSql.mockResolvedValue([{ id: mockSummaryId }]);
 
@@ -217,7 +217,7 @@ describe("deleteSummaryAction", () => {
       vi.clearAllMocks();
 
       // Second call - failure (no matching record)
-      vi.mocked(currentUser).mockResolvedValue({ id: mockUserId } as any);
+      vi.mocked(withAuth).mockResolvedValue({ user: { id: mockUserId } } as any);
       vi.mocked(getDbConnection).mockResolvedValue(mockSql as any);
       mockSql.mockResolvedValue([]);
 

@@ -2,8 +2,9 @@
 
 import { getDbConnection } from "@/lib/db";
 import { fetchAndExtractPdfText } from "@/lib/langchain";
-import { generateSummaryFromOpenAI } from "@/lib/openai";
-import { auth } from "@clerk/nextjs/server";
+import { generateSummaryFromClaude } from "@/lib/claude";
+import { SummaryTemplate, DEFAULT_TEMPLATE } from "@/types/templates";
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import { revalidatePath } from "next/cache";
 
 export async function generatePdfText({ pdfUrl }: { pdfUrl: string }) {
@@ -59,17 +60,23 @@ export async function generatePdfText({ pdfUrl }: { pdfUrl: string }) {
   }
 }
 
-export async function generatePdfSummary({  pdfText }: { pdfText: string }) {
-  console.log("generatePdfSummary called with uploadResponse:");
+export async function generatePdfSummary({
+  pdfText,
+  template = DEFAULT_TEMPLATE
+}: {
+  pdfText: string;
+  template?: SummaryTemplate;
+}) {
+  console.log("generatePdfSummary called with template:", template);
 
   try {
     let summary;
     try {
-      console.log("Generating summary from OpenAI...");
-      summary = await generateSummaryFromOpenAI(pdfText);
+      console.log("Generating summary from Claude...");
+      summary = await generateSummaryFromClaude(pdfText, template);
       console.log("Summary generated:");
     } catch (e) {
-      console.error("Error generating summary from OpenAI:", e);
+      console.error("Error generating summary from Claude:", e);
     }
     if (!summary) {
       console.error("Summary generation failed");
@@ -122,14 +129,14 @@ export async function storePdfSummaryAction({ fileUrl, summary, title, fileName 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let savePdfSummary: any;
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const { user } = await withAuth();
+    if (!user?.id) {
       return {
         success: false,
         message: "User not found"
       };
     }
-    savePdfSummary = await savePdfSummaryDB({ userId, fileUrl, summary, title, fileName });
+    savePdfSummary = await savePdfSummaryDB({ userId: user.id, fileUrl, summary, title, fileName });
     if (!savePdfSummary) {
       return {
         success: false,

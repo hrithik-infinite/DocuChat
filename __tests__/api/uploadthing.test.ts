@@ -35,11 +35,11 @@ vi.mock("uploadthing/server", () => ({
   }
 }));
 
-vi.mock("@clerk/nextjs/server", () => ({
-  currentUser: vi.fn()
+vi.mock("@workos-inc/authkit-nextjs", () => ({
+  withAuth: vi.fn()
 }));
 
-import { currentUser } from "@clerk/nextjs/server";
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import { UploadThingError } from "uploadthing/server";
 
 describe("uploadthing core", () => {
@@ -52,7 +52,7 @@ describe("uploadthing core", () => {
 
   describe("pdfUploader middleware", () => {
     it("should throw UploadThingError when user is not authenticated", async () => {
-      vi.mocked(currentUser).mockResolvedValue(null);
+      vi.mocked(withAuth).mockResolvedValue({ user: null } as any);
 
       // Import the module to capture the middleware
       await import("@/app/api/uploadthing/core");
@@ -65,12 +65,14 @@ describe("uploadthing core", () => {
     });
 
     it("should return userId when user is authenticated", async () => {
-      vi.mocked(currentUser).mockResolvedValue({
-        id: "user_123",
-        firstName: "Test",
-        lastName: "User",
-        emailAddresses: []
-      } as unknown as Awaited<ReturnType<typeof currentUser>>);
+      vi.mocked(withAuth).mockResolvedValue({
+        user: {
+          id: "user_123",
+          firstName: "Test",
+          lastName: "User",
+          email: "test@example.com"
+        }
+      } as any);
 
       await import("@/app/api/uploadthing/core");
 
@@ -80,23 +82,23 @@ describe("uploadthing core", () => {
       expect(result).toEqual({ userId: "user_123" });
     });
 
-    it("should call currentUser to check authentication", async () => {
-      vi.mocked(currentUser).mockResolvedValue({
-        id: "user_456"
-      } as unknown as Awaited<ReturnType<typeof currentUser>>);
+    it("should call withAuth to check authentication", async () => {
+      vi.mocked(withAuth).mockResolvedValue({
+        user: { id: "user_456" }
+      } as any);
 
       await import("@/app/api/uploadthing/core");
       await capturedMiddleware!();
 
-      expect(currentUser).toHaveBeenCalled();
+      expect(withAuth).toHaveBeenCalled();
     });
   });
 
   describe("pdfUploader onUploadComplete", () => {
     it("should return userId, name, and url on upload complete", async () => {
-      vi.mocked(currentUser).mockResolvedValue({
-        id: "user_789"
-      } as unknown as Awaited<ReturnType<typeof currentUser>>);
+      vi.mocked(withAuth).mockResolvedValue({
+        user: { id: "user_789" }
+      } as any);
 
       await import("@/app/api/uploadthing/core");
 
@@ -115,9 +117,9 @@ describe("uploadthing core", () => {
     });
 
     it("should use metadata userId from middleware", async () => {
-      vi.mocked(currentUser).mockResolvedValue({
-        id: "user_abc"
-      } as unknown as Awaited<ReturnType<typeof currentUser>>);
+      vi.mocked(withAuth).mockResolvedValue({
+        user: { id: "user_abc" }
+      } as any);
 
       await import("@/app/api/uploadthing/core");
 
@@ -130,9 +132,9 @@ describe("uploadthing core", () => {
     });
 
     it("should extract file name from file object", async () => {
-      vi.mocked(currentUser).mockResolvedValue({
-        id: "user_xyz"
-      } as unknown as Awaited<ReturnType<typeof currentUser>>);
+      vi.mocked(withAuth).mockResolvedValue({
+        user: { id: "user_xyz" }
+      } as any);
 
       await import("@/app/api/uploadthing/core");
 
@@ -145,9 +147,9 @@ describe("uploadthing core", () => {
     });
 
     it("should extract url from file.ufsUrl", async () => {
-      vi.mocked(currentUser).mockResolvedValue({
-        id: "user_test"
-      } as unknown as Awaited<ReturnType<typeof currentUser>>);
+      vi.mocked(withAuth).mockResolvedValue({
+        user: { id: "user_test" }
+      } as any);
 
       await import("@/app/api/uploadthing/core");
 
@@ -161,9 +163,9 @@ describe("uploadthing core", () => {
 
     it("should log upload completion", async () => {
       vi.spyOn(console, "log").mockImplementation(() => {});
-      vi.mocked(currentUser).mockResolvedValue({
-        id: "user_log"
-      } as unknown as Awaited<ReturnType<typeof currentUser>>);
+      vi.mocked(withAuth).mockResolvedValue({
+        user: { id: "user_log" }
+      } as any);
 
       await import("@/app/api/uploadthing/core");
 

@@ -1,9 +1,12 @@
 import { FileText } from "lucide-react";
 import NavLink from "./nav-link";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import PlanBadge from "./PlanBadge";
+import { withAuth, signOut } from "@workos-inc/authkit-nextjs";
+import { Button } from "@/components/ui/button";
 
-export default function Header() {
+export default async function Header() {
+  const { user } = await withAuth({ ensureSignedIn: false });
+
   return (
     <nav className="container flex items-center justify-between py-4 lg:px-8 px-2 mx-auto">
       <div className="flex lg:flex-1">
@@ -14,24 +17,27 @@ export default function Header() {
       </div>
       <div className="flex lg:justify-center gap-4 lg:gap-12 lg:items-center">
         <NavLink href="/#pricing">Pricing</NavLink>
-        <SignedIn>
-          <NavLink href="/dashboard">Your Summaries</NavLink>
-        </SignedIn>
+        {user && <NavLink href="/dashboard">Your Summaries</NavLink>}
       </div>
       <div className="flex lg:justify-end lg:flex-1">
-        <SignedIn>
+        {user ? (
           <div className="flex gap-2 items-center">
             <NavLink href="/upload">Upload a PDF</NavLink>
             <PlanBadge />
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
+            <form
+              action={async () => {
+                "use server";
+                await signOut();
+              }}
+            >
+              <Button variant="ghost" size="sm" type="submit">
+                Sign Out
+              </Button>
+            </form>
           </div>
-        </SignedIn>
-
-        <SignedOut>
+        ) : (
           <NavLink href="/sign-in">Sign In</NavLink>
-        </SignedOut>
+        )}
       </div>
     </nav>
   );

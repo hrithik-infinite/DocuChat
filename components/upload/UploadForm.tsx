@@ -1,6 +1,7 @@
 "use client";
 import { useUploadThing } from "@/utils/uploadthing";
 import UploadFormInput from "./UploadFormInput";
+import TemplateSelector from "./TemplateSelector";
 import { toast } from "sonner";
 import { z } from "zod";
 import { generatePdfSummary, generatePdfText, storePdfSummaryAction } from "@/actions/upload-actions";
@@ -8,6 +9,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "./LoadingSkeleton";
 import { formatFileName } from "@/lib/utils";
+import { SummaryTemplate, DEFAULT_TEMPLATE } from "@/types/templates";
 
 export default function UploadForm() {
   const schema = z.object({
@@ -18,6 +20,7 @@ export default function UploadForm() {
   });
   const formRef = useRef<HTMLFormElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<SummaryTemplate>(DEFAULT_TEMPLATE);
   const router = useRouter();
   const { startUpload } = useUploadThing("pdfUploader", {
     onClientUploadComplete: () => {
@@ -75,7 +78,8 @@ export default function UploadForm() {
       });
 
       const summaryResult = await generatePdfSummary({
-        pdfText: result?.data?.pdfText ?? ""
+        pdfText: result?.data?.pdfText ?? "",
+        template: selectedTemplate
       });
 
       toast.info("Saving PDF Summary", {
@@ -108,6 +112,11 @@ export default function UploadForm() {
   };
   return (
     <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto">
+      <TemplateSelector
+        selectedTemplate={selectedTemplate}
+        onTemplateChange={setSelectedTemplate}
+        disabled={isLoading}
+      />
       <UploadFormInput isLoading={isLoading} ref={formRef} onSubmit={handleSubmit} />
       {isLoading && (
         <>
