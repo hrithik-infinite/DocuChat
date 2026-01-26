@@ -56,3 +56,20 @@ CREATE TRIGGER update_payments_updated_at
     BEFORE UPDATE ON payments
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+-- Chat support: store original document text for RAG
+ALTER TABLE pdf_summaries ADD COLUMN IF NOT EXISTS original_text TEXT;
+
+-- Document chunks for RAG (Retrieval-Augmented Generation)
+CREATE TABLE IF NOT EXISTS document_chunks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    summary_id UUID NOT NULL REFERENCES pdf_summaries(id) ON DELETE CASCADE,
+    chunk_index INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    start_char INTEGER,
+    end_char INTEGER,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_chunks_summary_id ON document_chunks(summary_id);
+CREATE INDEX IF NOT EXISTS idx_chunks_summary_chunk ON document_chunks(summary_id, chunk_index);

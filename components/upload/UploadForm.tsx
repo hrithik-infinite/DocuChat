@@ -120,7 +120,8 @@ export default function UploadForm() {
           fileUrl: uploadFileUrl,
           summary: data.summary,
           title: formattedFileName,
-          fileName: file.name
+          fileName: file.name,
+          originalText: result.data.documentText
         });
         toast.success("Summary generated", {
           description: "Your document has been successfully summarized and saved"

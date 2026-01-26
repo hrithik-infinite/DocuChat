@@ -2,6 +2,7 @@ import BgGradient from "@/components/common/BgGradient";
 import SourceInfo from "@/components/summaries/SourceInfo";
 import SummaryHeader from "@/components/summaries/SummaryHeader";
 import SummaryViewer from "@/components/summaries/SummaryViewer";
+import ChatPanel from "@/components/summaries/ChatPanel";
 import { getSummaryById } from "@/lib/summaries";
 import { FileText } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -41,6 +42,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           </div>
         </div>
       </div>
+
+      {/* Chat Panel */}
+      <ChatPanel summaryId={id} documentTitle={title} />
     </div>
   );
 }

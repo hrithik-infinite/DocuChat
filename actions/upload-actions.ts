@@ -163,7 +163,21 @@ export async function generatePdfSummary({
     };
   }
 }
-async function savePdfSummaryDB({ userId, fileUrl, summary, title, fileName }: { userId: string; fileUrl: string; summary: string; title: string; fileName: string }) {
+async function savePdfSummaryDB({
+  userId,
+  fileUrl,
+  summary,
+  title,
+  fileName,
+  originalText
+}: {
+  userId: string;
+  fileUrl: string;
+  summary: string;
+  title: string;
+  fileName: string;
+  originalText?: string;
+}) {
   try {
     const sql = await getDbConnection();
     const [savedSummary] = await sql`INSERT INTO pdf_summaries (
@@ -171,22 +185,36 @@ async function savePdfSummaryDB({ userId, fileUrl, summary, title, fileName }: {
     original_file_url,
     summary_text,
     title,
-    file_name
+    file_name,
+    original_text
   ) values(
     ${userId},
     ${fileUrl},
     ${summary},
     ${title},
-    ${fileName}
+    ${fileName},
+    ${originalText || null}
   ) RETURNING id, summary_text;`;
     return savedSummary;
   } catch (e) {
-    console.error("Error saving pd dsumamry", e);
+    console.error("Error saving pdf summary", e);
     throw e;
   }
 }
 
-export async function storePdfSummaryAction({ fileUrl, summary, title, fileName }: { fileUrl: string; summary: string; title: string; fileName: string }) {
+export async function storePdfSummaryAction({
+  fileUrl,
+  summary,
+  title,
+  fileName,
+  originalText
+}: {
+  fileUrl: string;
+  summary: string;
+  title: string;
+  fileName: string;
+  originalText?: string;
+}) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let savePdfSummary: any;
   try {
@@ -197,7 +225,14 @@ export async function storePdfSummaryAction({ fileUrl, summary, title, fileName 
         message: "User not found"
       };
     }
-    savePdfSummary = await savePdfSummaryDB({ userId: user.id, fileUrl, summary, title, fileName });
+    savePdfSummary = await savePdfSummaryDB({
+      userId: user.id,
+      fileUrl,
+      summary,
+      title,
+      fileName,
+      originalText
+    });
     if (!savePdfSummary) {
       return {
         success: false,
@@ -213,7 +248,7 @@ export async function storePdfSummaryAction({ fileUrl, summary, title, fileName 
   revalidatePath(`/summaries/${savePdfSummary.id}`);
   return {
     success: true,
-    message: "Failed to save summary",
+    message: "Summary saved successfully",
     data: {
       id: savePdfSummary.id
     }
