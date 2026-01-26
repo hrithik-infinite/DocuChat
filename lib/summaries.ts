@@ -1,26 +1,34 @@
-import { getDbConnection } from "./db";
+import { db } from "./db";
+import { pdfSummaries } from "@/db/schema";
+import { eq, desc, sql, count } from "drizzle-orm";
 
 export async function getSummaries(userId: string) {
-  const sql = await getDbConnection();
-  const summaries = await sql`SELECT * from pdf_summaries where user_id = ${userId} ORDER BY created_at DESC`;
+  const summaries = await db
+    .select()
+    .from(pdfSummaries)
+    .where(eq(pdfSummaries.userId, userId))
+    .orderBy(desc(pdfSummaries.createdAt));
   return summaries;
 }
 
 export async function getSummaryById(id: string) {
   try {
-    const sql = await getDbConnection();
-    const [summary] = await sql`SELECT
-      id,
-      user_id,
-      title,
-      original_file_url,
-      summary_text,
-      status,
-      created_at,
-      updated_at,
-      file_name,
-      LENGTH(summary_text) - LENGTH(REPLACE(summary_text, ' ', '')) + 1 AS word_count
-    FROM pdf_summaries WHERE id = ${id}`;
+    const [summary] = await db
+      .select({
+        id: pdfSummaries.id,
+        user_id: pdfSummaries.userId,
+        title: pdfSummaries.title,
+        original_file_url: pdfSummaries.originalFileUrl,
+        summary_text: pdfSummaries.summaryText,
+        original_text: pdfSummaries.originalText,
+        status: pdfSummaries.status,
+        created_at: pdfSummaries.createdAt,
+        updated_at: pdfSummaries.updatedAt,
+        file_name: pdfSummaries.fileName,
+        word_count: sql<number>`LENGTH(${pdfSummaries.summaryText}) - LENGTH(REPLACE(${pdfSummaries.summaryText}, ' ', '')) + 1`,
+      })
+      .from(pdfSummaries)
+      .where(eq(pdfSummaries.id, id));
 
     return summary;
   } catch (err) {
@@ -30,10 +38,12 @@ export async function getSummaryById(id: string) {
 }
 
 export async function getUserUploadCount(userId: string) {
-  const sql = await getDbConnection();
   try {
-    const [res] = await sql`SELECT COUNT(*) as count FROM pdf_summaries WHERE user_id = ${userId}`;
-    return res?.count || 0;
+    const [result] = await db
+      .select({ count: count() })
+      .from(pdfSummaries)
+      .where(eq(pdfSummaries.userId, userId));
+    return result?.count || 0;
   } catch (e) {
     console.error("error in upload count", e);
     return 0;

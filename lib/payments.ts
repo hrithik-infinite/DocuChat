@@ -1,5 +1,7 @@
 import Stripe from "stripe";
-import { getDbConnection } from "./db";
+import { db } from "./db";
+import { users, payments } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function handleCheckoutSessionCompleted({ session, stripe }: { session: Stripe.Checkout.Session; stripe: Stripe }) {
   console.log("checkout session completed", session);
@@ -26,12 +28,19 @@ export async function handleCheckoutSessionCompleted({ session, stripe }: { sess
 
 async function createOrUpdateUser({ email, fullName, customerId, priceId, status }: { email: string; fullName: string; customerId: string; priceId: string; status: string }) {
   try {
-    const sql = await getDbConnection();
-    const user = await sql`SELECT * FROM users WHERE email = ${email}`;
-    if (user.length === 0) {
-      await sql`INSERT INTO users (email, full_name ,customer_id, price_id, status)
-        VALUES
-        (${email}, ${fullName}, ${customerId}, ${priceId}, ${status})`;
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email));
+
+    if (existingUser.length === 0) {
+      await db.insert(users).values({
+        email,
+        fullName,
+        customerId,
+        priceId,
+        status
+      });
     }
   } catch (e) {
     console.error("error in creating or updating user", e);
@@ -40,23 +49,28 @@ async function createOrUpdateUser({ email, fullName, customerId, priceId, status
 
 async function createPayment({ session, priceId, userEmail }: { session: Stripe.Checkout.Session; priceId: string; userEmail: string }) {
   try {
-    const sql = await getDbConnection();
     const { amount_total, id, status } = session;
-    await sql`INSERT INTO payments (amount, status, stripe_payment_id, price_id, user_email) VALUES (
-            ${amount_total}, ${status}, ${id} , ${priceId}, ${userEmail}
-        )`;
+    await db.insert(payments).values({
+      amount: amount_total || 0,
+      status: status || "unknown",
+      stripePaymentId: id,
+      priceId,
+      userEmail
+    });
   } catch (e) {
-    console.error("Error creating pament", e);
+    console.error("Error creating payment", e);
   }
 }
 
 export async function handleSubscriptionDeleted({ subscriptionId, stripe }: { subscriptionId: string; stripe: Stripe }) {
   try {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-    const sql = await getDbConnection();
-    await sql`UPDATE users SET status = 'cancelled' where customer_id = ${subscription.customer}`;
+    await db
+      .update(users)
+      .set({ status: "cancelled" })
+      .where(eq(users.customerId, subscription.customer as string));
   } catch (e) {
-    console.error("error in subscription dlete", e);
+    console.error("error in subscription delete", e);
     throw e;
   }
 }

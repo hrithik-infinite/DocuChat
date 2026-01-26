@@ -2,11 +2,12 @@
 import { DownloadIcon } from "lucide-react";
 import { Button } from "../ui/button";
 
-export default function DownloadSummaryButton({ title, summaryText, fileName, createdAt }: { title: string; summaryText: string; fileName: string; createdAt: string }) {
+export default function DownloadSummaryButton({ title, summaryText, fileName, createdAt }: { title: string; summaryText: string; fileName: string; createdAt: Date | string | null }) {
   const handleDownload = () => {
+    const formattedDate = createdAt ? new Date(createdAt).toLocaleDateString() : "Unknown date";
     const summaryContent = `# ${title}
 Generated Summary
-Generated on: ${new Date(createdAt).toLocaleDateString()}
+Generated on: ${formattedDate}
 
 ${summaryText}
 

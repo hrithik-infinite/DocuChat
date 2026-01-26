@@ -1,6 +1,7 @@
 "use server";
 
-import { getDbConnection } from "@/lib/db";
+import { db } from "@/lib/db";
+import { pdfSummaries } from "@/db/schema";
 import { fetchAndExtractPdfText } from "@/lib/langchain";
 import { extractTextFromDocument, getFileTypeFromExtension, type SupportedFileType } from "@/lib/document-parser";
 import { generateSummaryFromClaude } from "@/lib/claude";
@@ -169,7 +170,8 @@ async function savePdfSummaryDB({
   summary,
   title,
   fileName,
-  originalText
+  originalText,
+  template
 }: {
   userId: string;
   fileUrl: string;
@@ -177,24 +179,23 @@ async function savePdfSummaryDB({
   title: string;
   fileName: string;
   originalText?: string;
+  template?: SummaryTemplate;
 }) {
   try {
-    const sql = await getDbConnection();
-    const [savedSummary] = await sql`INSERT INTO pdf_summaries (
-    user_id,
-    original_file_url,
-    summary_text,
-    title,
-    file_name,
-    original_text
-  ) values(
-    ${userId},
-    ${fileUrl},
-    ${summary},
-    ${title},
-    ${fileName},
-    ${originalText || null}
-  ) RETURNING id, summary_text;`;
+    const wordCount = originalText ? originalText.split(/\s+/).filter(Boolean).length : null;
+    const [savedSummary] = await db
+      .insert(pdfSummaries)
+      .values({
+        userId,
+        originalFileUrl: fileUrl,
+        summaryText: summary,
+        title,
+        fileName,
+        originalText: originalText || null,
+        wordCount,
+        template: template || DEFAULT_TEMPLATE,
+      })
+      .returning({ id: pdfSummaries.id, summaryText: pdfSummaries.summaryText });
     return savedSummary;
   } catch (e) {
     console.error("Error saving pdf summary", e);
@@ -207,13 +208,15 @@ export async function storePdfSummaryAction({
   summary,
   title,
   fileName,
-  originalText
+  originalText,
+  template
 }: {
   fileUrl: string;
   summary: string;
   title: string;
   fileName: string;
   originalText?: string;
+  template?: SummaryTemplate;
 }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let savePdfSummary: any;
@@ -231,7 +234,8 @@ export async function storePdfSummaryAction({
       summary,
       title,
       fileName,
-      originalText
+      originalText,
+      template
     });
     if (!savePdfSummary) {
       return {

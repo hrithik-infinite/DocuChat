@@ -121,7 +121,8 @@ export default function UploadForm() {
           summary: data.summary,
           title: formattedFileName,
           fileName: file.name,
-          originalText: result.data.documentText
+          originalText: result.data.documentText,
+          template: selectedTemplate
         });
         toast.success("Summary generated", {
           description: "Your document has been successfully summarized and saved"

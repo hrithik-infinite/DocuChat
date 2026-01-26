@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run --coverage"
+    "test": "vitest run --coverage",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
@@ -22,6 +26,7 @@
     "clsx": "^2.1.1",
     "core-ts-utils": "^1.1.0",
     "date-fns": "^4.1.0",
+    "drizzle-orm": "^0.45.1",
     "lucide-react": "^0.563.0",
     "mammoth": "^1.11.0",
     "next": "^15.5.9",
@@ -48,10 +53,13 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^4.0.18",
+    "dotenv": "^17.2.3",
+    "drizzle-kit": "^0.31.8",
     "eslint": "^9",
     "eslint-config-next": "^15.5.9",
     "jsdom": "^27.4.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "tw-animate-css": "^1.3.4",
     "typescript": "^5",
     "vitest": "^4.0.18"

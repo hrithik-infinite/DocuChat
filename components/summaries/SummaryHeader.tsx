@@ -3,7 +3,15 @@ import { Button } from "../ui/button";
 import { Calendar, ChevronLeft, Clock, Sparkles } from "lucide-react";
 import { Badge } from "../ui/badge";
 
-export default function SummaryHeader({ title, createdAt, readingTime }: { title: string; createdAt: string; readingTime: number }) {
+export default function SummaryHeader({ title, createdAt, readingTime }: { title: string; createdAt: Date | string | null; readingTime: number }) {
+  const formattedDate = createdAt
+    ? new Date(createdAt).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      })
+    : "Unknown date";
+
   return (
     <div className="flex gap-4 mb-4 justify-between">
       <div className="space-y-6">
@@ -14,11 +22,7 @@ export default function SummaryHeader({ title, createdAt, readingTime }: { title
           </Badge>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="h-4 w-4 text-rose-400" />
-            {new Date(createdAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric"
-            })}
+            {formattedDate}
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="h-4 w-4 text-rose-400" />

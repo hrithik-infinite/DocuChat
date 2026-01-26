@@ -1,11 +1,15 @@
-import { getDbConnection } from "@/lib/db";
+import { db } from "@/lib/db";
+import { users } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 import { getUserUploadCount } from "@/lib/summaries";
 import { plans } from "./contants";
 
 export async function getPriceId(email: string) {
-  const sql = await getDbConnection();
-  const query = await sql`SELECT price_id FROM users where email = ${email} AND status = 'active'`;
-  return query?.[0]?.price_id || null;
+  const [user] = await db
+    .select({ priceId: users.priceId })
+    .from(users)
+    .where(and(eq(users.email, email), eq(users.status, "active")));
+  return user?.priceId || null;
 }
 
 export async function hasReachedUploadLimit(userId: string) {

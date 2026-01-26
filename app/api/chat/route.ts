@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@workos-inc/authkit-nextjs";
-import { getDbConnection } from "@/lib/db";
+import { db } from "@/lib/db";
+import { pdfSummaries } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { generateChatResponse, generateChatResponseWithFullDoc, ChatMessage } from "@/lib/chat";
 import { chunkDocument, getRelevantChunks, buildContext } from "@/lib/chunking";
 
@@ -24,25 +26,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const sql = await getDbConnection();
-
     // Get the summary and verify ownership
-    const [summary] = await sql`
-      SELECT id, user_id, original_text, summary_text, title
-      FROM pdf_summaries
-      WHERE id = ${summaryId}
-    `;
+    const [summary] = await db
+      .select({
+        id: pdfSummaries.id,
+        userId: pdfSummaries.userId,
+        originalText: pdfSummaries.originalText,
+        summaryText: pdfSummaries.summaryText,
+        title: pdfSummaries.title,
+      })
+      .from(pdfSummaries)
+      .where(eq(pdfSummaries.id, summaryId));
 
     if (!summary) {
       return NextResponse.json({ error: "Summary not found" }, { status: 404 });
     }
 
-    if (summary.user_id !== user.id) {
+    if (summary.userId !== user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    // Get the document text (prefer original_text, fall back to summary_text)
-    const documentText = summary.original_text || summary.summary_text;
+    // Get the document text (prefer originalText, fall back to summaryText)
+    const documentText = summary.originalText || summary.summaryText;
 
     if (!documentText) {
       return NextResponse.json(
